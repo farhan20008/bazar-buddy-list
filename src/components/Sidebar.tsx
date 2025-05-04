@@ -51,9 +51,7 @@ export function Sidebar({
           <span className="text-lg font-semibold tracking-tight text-sidebar-foreground">
             Bazar Buddy
           </span>
-          <span className="text-xs text-sidebar-foreground/60">
-            Grocery management
-          </span>
+          <span className="text-xs text-sidebar-foreground/60">Family Grocery management</span>
         </div>
       </div>
       <Separator className="my-2" />
