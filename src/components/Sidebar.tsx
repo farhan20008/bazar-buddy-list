@@ -44,7 +44,7 @@ export function Sidebar({
   }];
   const SidebarContent = () => <div className="flex h-screen flex-col border-r bg-sidebar pt-2">
       <div className="flex items-center gap-2 px-4 py-3">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg text-primary-foreground bg-yellow-500">
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg text-primary-foreground bg-orange-600">
           <User size={16} />
         </div>
         <div className="flex flex-col">
