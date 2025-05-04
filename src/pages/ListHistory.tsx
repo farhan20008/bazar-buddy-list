@@ -47,14 +47,14 @@ const ListHistory = () => {
             View and manage your past grocery lists
           </p>
         </div>
-        <div className="w-full md:w-auto">
+        <div className="w-full md:w-auto relative">
           <Input
             placeholder="Search lists..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="md:w-[250px]"
-            icon={<Search className="h-4 w-4 text-muted-foreground" />}
+            className="md:w-[250px] pl-8"
           />
+          <Search className="h-4 w-4 text-muted-foreground absolute left-2 top-1/2 transform -translate-y-1/2" />
         </div>
       </div>
 

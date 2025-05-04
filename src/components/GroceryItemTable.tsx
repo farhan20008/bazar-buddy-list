@@ -10,7 +10,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import {
   DropdownMenu,
@@ -34,9 +33,10 @@ import { Edit, MoreHorizontal, Trash } from "lucide-react";
 interface GroceryItemTableProps {
   listId: string;
   items: GroceryItem[];
+  onDelete?: (id: string) => void;
 }
 
-export function GroceryItemTable({ listId, items }: GroceryItemTableProps) {
+export function GroceryItemTable({ listId, items, onDelete }: GroceryItemTableProps) {
   const { removeItemFromList } = useGrocery();
   const [editItem, setEditItem] = useState<GroceryItem | null>(null);
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
@@ -47,7 +47,11 @@ export function GroceryItemTable({ listId, items }: GroceryItemTableProps) {
 
   const handleDelete = (itemId: string) => {
     setItemToDelete(null);
-    removeItemFromList(listId, itemId);
+    if (onDelete) {
+      onDelete(itemId);
+    } else {
+      removeItemFromList(listId, itemId);
+    }
   };
 
   return (

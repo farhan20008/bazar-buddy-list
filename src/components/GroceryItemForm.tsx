@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useGrocery, GroceryItem } from "@/contexts/GroceryContext";
 import { Button } from "@/components/ui/button";
@@ -17,7 +16,7 @@ import { toast } from "@/components/ui/use-toast";
 interface GroceryItemFormProps {
   listId: string;
   item?: GroceryItem;
-  onSubmit?: () => void;
+  onSubmit?: (item?: GroceryItem) => void;
 }
 
 const UNITS = ["kg", "g", "lb", "pcs", "l", "ml", "dozen"];
@@ -80,7 +79,7 @@ export function GroceryItemForm({ listId, item, onSubmit }: GroceryItemFormProps
     }
     
     if (onSubmit) {
-      onSubmit();
+      onSubmit(item);
     }
   };
 

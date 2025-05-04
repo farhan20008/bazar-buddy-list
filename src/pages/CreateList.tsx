@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGrocery, GroceryItem } from "@/contexts/GroceryContext";
@@ -110,7 +109,7 @@ const CreateList = () => {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        {/* List Details */}
+        {/* List Details Card */}
         <Card>
           <CardHeader>
             <CardTitle>List Information</CardTitle>
