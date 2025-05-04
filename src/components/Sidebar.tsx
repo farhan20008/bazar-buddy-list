@@ -1,64 +1,50 @@
-
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
-import {
-  LayoutDashboard,
-  PlusCircle,
-  ListMusic,
-  LogOut,
-  Menu,
-  X,
-  User,
-} from "lucide-react";
+import { LayoutDashboard, PlusCircle, ListMusic, LogOut, Menu, X, User } from "lucide-react";
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import { toast } from "@/components/ui/use-toast";
-
 interface SidebarProps {
   className?: string;
 }
-
-export function Sidebar({ className }: SidebarProps) {
+export function Sidebar({
+  className
+}: SidebarProps) {
   const [open, setOpen] = useState(false);
-  const { user, logout } = useAuth();
+  const {
+    user,
+    logout
+  } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-
   const onLogout = () => {
     logout();
     navigate("/login");
     toast({
       title: "Logged out",
-      description: "You have been logged out successfully",
+      description: "You have been logged out successfully"
     });
   };
-
-  const sidebarLinks = [
-    {
-      name: "Dashboard",
-      href: "/dashboard",
-      icon: <LayoutDashboard size={18} />,
-    },
-    {
-      name: "Create List",
-      href: "/create-list",
-      icon: <PlusCircle size={18} />,
-    },
-    {
-      name: "List History",
-      href: "/list-history",
-      icon: <ListMusic size={18} />,
-    },
-  ];
-
-  const SidebarContent = () => (
-    <div className="flex h-screen flex-col border-r bg-sidebar pt-2">
+  const sidebarLinks = [{
+    name: "Dashboard",
+    href: "/dashboard",
+    icon: <LayoutDashboard size={18} />
+  }, {
+    name: "Create List",
+    href: "/create-list",
+    icon: <PlusCircle size={18} />
+  }, {
+    name: "List History",
+    href: "/list-history",
+    icon: <ListMusic size={18} />
+  }];
+  const SidebarContent = () => <div className="flex h-screen flex-col border-r bg-sidebar pt-2">
       <div className="flex items-center gap-2 px-4 py-3">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg text-primary-foreground bg-yellow-500">
           <User size={16} />
         </div>
         <div className="flex flex-col">
@@ -73,24 +59,14 @@ export function Sidebar({ className }: SidebarProps) {
       <Separator className="my-2" />
       <div className="flex-1 px-1 py-2">
         <nav className="flex flex-col gap-1">
-          {sidebarLinks.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              onClick={(e) => {
-                e.preventDefault();
-                navigate(link.href);
-                setOpen(false);
-              }}
-              className={cn(
-                "sidebar-item",
-                location.pathname === link.href && "active"
-              )}
-            >
+          {sidebarLinks.map(link => <a key={link.href} href={link.href} onClick={e => {
+          e.preventDefault();
+          navigate(link.href);
+          setOpen(false);
+        }} className={cn("sidebar-item", location.pathname === link.href && "active")}>
               {link.icon}
               {link.name}
-            </a>
-          ))}
+            </a>)}
         </nav>
       </div>
       <div className="sticky bottom-0 border-t border-sidebar-border bg-sidebar p-3">
@@ -110,22 +86,15 @@ export function Sidebar({ className }: SidebarProps) {
               </span>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onLogout}
-            className="text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-          >
+          <Button variant="ghost" size="icon" onClick={onLogout} className="text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
             <LogOut size={18} />
           </Button>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 
   // Mobile sidebar using Sheet component
-  return (
-    <>
+  return <>
       <div className={cn("hidden h-screen w-64 md:block", className)}>
         <SidebarContent />
       </div>
@@ -148,12 +117,7 @@ export function Sidebar({ className }: SidebarProps) {
             </div>
           </div>
           <SheetContent side="left" className="p-0">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute right-4 top-4 md:hidden"
-              onClick={() => setOpen(false)}
-            >
+            <Button variant="ghost" size="icon" className="absolute right-4 top-4 md:hidden" onClick={() => setOpen(false)}>
               <X className="h-5 w-5" />
               <span className="sr-only">Close sidebar</span>
             </Button>
@@ -161,6 +125,5 @@ export function Sidebar({ className }: SidebarProps) {
           </SheetContent>
         </Sheet>
       </div>
-    </>
-  );
+    </>;
 }
