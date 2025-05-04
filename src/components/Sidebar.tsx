@@ -104,7 +104,7 @@ export function Sidebar({
               </Button>
             </SheetTrigger>
             <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+              <div className="flex h-8 w-8 items-center justify-center text-primary-foreground rounded-2xl bg-orange-600">
                 <User size={16} />
               </div>
               <span className="text-lg font-semibold tracking-tight">
