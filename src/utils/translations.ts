@@ -252,6 +252,10 @@ export const translations: Translations = {
     en: "lists in total • Click on a list to view or edit",
     bn: "মোট তালিকা • দেখতে বা সম্পাদনা করতে একটি তালিকায় ক্লিক করুন"
   },
+  clickToView: {
+    en: "Click to view or edit",
+    bn: "দেখতে বা সম্পাদনা করতে ক্লিক করুন"
+  },
   noListsMatch: {
     en: "No lists match your search.",
     bn: "আপনার অনুসন্ধানের সাথে কোন তালিকা মেলে না।"
