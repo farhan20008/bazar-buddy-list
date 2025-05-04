@@ -20,7 +20,41 @@ type TranslationKey =
   | "estCost"
   | "noListsYet"
   | "createFirstList"
-  | "language";
+  | "language"
+  | "createNewList"
+  | "addItems"
+  | "listInformation"
+  | "listDetails"
+  | "listTitle"
+  | "month"
+  | "year"
+  | "saveList"
+  | "saving"
+  | "addItem"
+  | "addNewItem"
+  | "itemsInList"
+  | "login"
+  | "register"
+  | "email"
+  | "password"
+  | "forgotPassword"
+  | "dontHaveAccount"
+  | "signUp"
+  | "loginToAccount"
+  | "enterEmail"
+  | "listHistory"
+  | "viewManageLists"
+  | "searchLists"
+  | "yourGroceryLists"
+  | "listsTotal"
+  | "clickToView"
+  | "noListsMatch"
+  | "clearSearch"
+  | "createdOn"
+  | "dashboard"
+  | "createList"
+  | "history"
+  | "logout";
 
 type Translations = {
   [key in TranslationKey]: {
@@ -113,6 +147,138 @@ export const translations: Translations = {
   language: {
     en: "বাংলা",
     bn: "English"
+  },
+  createNewList: {
+    en: "Create New List",
+    bn: "নতুন তালিকা তৈরি করুন"
+  },
+  addItems: {
+    en: "Add items to your grocery list",
+    bn: "আপনার মুদি তালিকায় আইটেম যোগ করুন"
+  },
+  listInformation: {
+    en: "List Information",
+    bn: "তালিকা তথ্য"
+  },
+  listDetails: {
+    en: "Provide basic information about your grocery list",
+    bn: "আপনার মুদি তালিকা সম্পর্কে মৌলিক তথ্য প্রদান করুন"
+  },
+  listTitle: {
+    en: "List Title",
+    bn: "তালিকার শিরোনাম"
+  },
+  month: {
+    en: "Month",
+    bn: "মাস"
+  },
+  year: {
+    en: "Year",
+    bn: "বছর"
+  },
+  saveList: {
+    en: "Save List",
+    bn: "তালিকা সংরক্ষণ করুন"
+  },
+  saving: {
+    en: "Saving",
+    bn: "সংরক্ষণ করা হচ্ছে"
+  },
+  addItem: {
+    en: "Add Item",
+    bn: "আইটেম যোগ করুন"
+  },
+  addNewItem: {
+    en: "Add a new item to your grocery list with AI price estimation",
+    bn: "AI মূল্য অনুমান সহ আপনার মুদি তালিকায় একটি নতুন আইটেম যোগ করুন"
+  },
+  itemsInList: {
+    en: "Items in Your List",
+    bn: "আপনার তালিকায় আইটেম"
+  },
+  login: {
+    en: "Login",
+    bn: "লগইন"
+  },
+  register: {
+    en: "Register",
+    bn: "নিবন্ধন করুন"
+  },
+  email: {
+    en: "Email",
+    bn: "ইমেইল"
+  },
+  password: {
+    en: "Password",
+    bn: "পাসওয়ার্ড"
+  },
+  forgotPassword: {
+    en: "Forgot password?",
+    bn: "পাসওয়ার্ড ভুলে গেছেন?"
+  },
+  dontHaveAccount: {
+    en: "Don't have an account?",
+    bn: "অ্যাকাউন্ট নেই?"
+  },
+  signUp: {
+    en: "Sign up",
+    bn: "নিবন্ধন করুন"
+  },
+  loginToAccount: {
+    en: "Login to your account",
+    bn: "আপনার অ্যাকাউন্টে লগইন করুন"
+  },
+  enterEmail: {
+    en: "Enter your email below to login to your account",
+    bn: "আপনার অ্যাকাউন্টে লগইন করতে নীচে আপনার ইমেল লিখুন"
+  },
+  listHistory: {
+    en: "List History",
+    bn: "তালিকা ইতিহাস"
+  },
+  viewManageLists: {
+    en: "View and manage your past grocery lists",
+    bn: "আপনার পূর্বের মুদি তালিকাগুলি দেখুন এবং পরিচালনা করুন"
+  },
+  searchLists: {
+    en: "Search lists...",
+    bn: "তালিকা খুঁজুন..."
+  },
+  yourGroceryLists: {
+    en: "Your Grocery Lists",
+    bn: "আপনার মুদি তালিকাগুলি"
+  },
+  listsTotal: {
+    en: "lists in total • Click on a list to view or edit",
+    bn: "মোট তালিকা • দেখতে বা সম্পাদনা করতে একটি তালিকায় ক্লিক করুন"
+  },
+  noListsMatch: {
+    en: "No lists match your search.",
+    bn: "আপনার অনুসন্ধানের সাথে কোন তালিকা মেলে না।"
+  },
+  clearSearch: {
+    en: "Clear search",
+    bn: "অনুসন্ধান পরিষ্কার করুন"
+  },
+  createdOn: {
+    en: "Created On",
+    bn: "তৈরি হয়েছে"
+  },
+  dashboard: {
+    en: "Dashboard",
+    bn: "ড্যাশবোর্ড"
+  },
+  createList: {
+    en: "Create List",
+    bn: "তালিকা তৈরি করুন"
+  },
+  history: {
+    en: "List History",
+    bn: "তালিকা ইতিহাস"
+  },
+  logout: {
+    en: "Logout",
+    bn: "লগআউট"
   }
 };
 

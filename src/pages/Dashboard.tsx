@@ -69,12 +69,9 @@ const Dashboard = () => {
   const totalSpent = lists.reduce((total, list) => total + list.totalEstimatedPrice, 0);
   const avgSpentPerList = totalLists > 0 ? totalSpent / totalLists : 0;
 
-  // Apply the selected font
-  const fontClass = isEnglish ? "font-inter" : "font-hind-siliguri";
-
   return (
     <DashboardLayout>
-      <div className={`${fontClass} min-h-screen`}>
+      <div className="min-h-screen">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">

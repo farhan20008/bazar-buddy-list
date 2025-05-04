@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGrocery } from "@/contexts/GroceryContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,9 +22,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Calendar, Search, ShoppingCart } from "lucide-react";
+import { getText } from "@/utils/translations";
 
 const ListHistory = () => {
   const { lists } = useGrocery();
+  const { language } = useLanguage();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -42,14 +45,16 @@ const ListHistory = () => {
     <DashboardLayout>
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">List History</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            {getText("listHistory", language)}
+          </h1>
           <p className="text-muted-foreground">
-            View and manage your past grocery lists
+            {getText("viewManageLists", language)}
           </p>
         </div>
         <div className="w-full md:w-auto relative">
           <Input
-            placeholder="Search lists..."
+            placeholder={getText("searchLists", language)}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="md:w-[250px] pl-8"
@@ -60,9 +65,9 @@ const ListHistory = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Your Grocery Lists</CardTitle>
+          <CardTitle>{getText("yourGroceryLists", language)}</CardTitle>
           <CardDescription>
-            {filteredLists.length} lists in total • Click on a list to view or edit
+            {filteredLists.length} {getText("listsTotal", language)}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -72,20 +77,20 @@ const ListHistory = () => {
                 <>
                   <Search className="h-12 w-12 text-muted-foreground/50 mb-4" />
                   <p className="text-muted-foreground mb-2">
-                    No lists match your search.
+                    {getText("noListsMatch", language)}
                   </p>
                   <Button variant="link" onClick={() => setSearchTerm("")}>
-                    Clear search
+                    {getText("clearSearch", language)}
                   </Button>
                 </>
               ) : (
                 <>
                   <ShoppingCart className="h-12 w-12 text-muted-foreground/50 mb-4" />
                   <p className="text-muted-foreground mb-4">
-                    You haven't created any grocery lists yet.
+                    {getText("noListsYet", language)}
                   </p>
                   <Button onClick={() => navigate("/create-list")}>
-                    Create Your First List
+                    {getText("createFirstList", language)}
                   </Button>
                 </>
               )}
@@ -95,11 +100,11 @@ const ListHistory = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>List Name</TableHead>
-                    <TableHead>Month</TableHead>
-                    <TableHead>Items</TableHead>
-                    <TableHead className="text-right">Est. Cost</TableHead>
-                    <TableHead className="text-right">Created On</TableHead>
+                    <TableHead>{getText("listName", language)}</TableHead>
+                    <TableHead>{getText("month", language)}</TableHead>
+                    <TableHead>{getText("items", language)}</TableHead>
+                    <TableHead className="text-right">{getText("estCost", language)}</TableHead>
+                    <TableHead className="text-right">{getText("createdOn", language)}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -118,7 +123,7 @@ const ListHistory = () => {
                             {list.month} {list.year}
                           </div>
                         </TableCell>
-                        <TableCell>{list.items.length} items</TableCell>
+                        <TableCell>{list.items.length} {getText("items", language)}</TableCell>
                         <TableCell className="text-right">
                           ${list.totalEstimatedPrice.toFixed(2)}
                         </TableCell>
