@@ -6,13 +6,23 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, User } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { getText } from "@/utils/translations";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const { language } = useLanguage();
+
+  // Redirect if already authenticated
+  useState(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    }
+  });
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -39,14 +49,14 @@ const Login = () => {
               </div>
               <h1 className="text-xl font-semibold tracking-tight">Bazar Buddy</h1>
             </div>
-            <h1 className="text-2xl font-bold">Login to your account</h1>
+            <h1 className="text-2xl font-bold">{getText("loginToAccount", language)}</h1>
             <p className="text-muted-foreground">
-              Enter your email below to login to your account
+              {getText("enterEmail", language)}
             </p>
           </div>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{getText("email", language)}</Label>
               <Input
                 id="email"
                 placeholder="m@example.com"
@@ -58,12 +68,12 @@ const Login = () => {
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">{getText("password", language)}</Label>
                 <Link
-                  to="#"
+                  to="/forgot-password"
                   className="text-sm text-muted-foreground hover:text-primary"
                 >
-                  Forgot password?
+                  {getText("forgotPassword", language)}
                 </Link>
               </div>
               <Input
@@ -81,14 +91,14 @@ const Login = () => {
                   Please wait
                 </>
               ) : (
-                "Login"
+                getText("login", language)
               )}
             </Button>
           </form>
           <div className="text-center text-sm">
-            Don't have an account?{" "}
+            {getText("dontHaveAccount", language)}{" "}
             <Link to="/register" className="text-primary hover:underline">
-              Sign up
+              {getText("signUp", language)}
             </Link>
           </div>
         </div>

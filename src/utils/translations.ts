@@ -1,4 +1,3 @@
-
 type TranslationKey = 
   | "dashboardTitle"
   | "welcome"
@@ -54,7 +53,17 @@ type TranslationKey =
   | "dashboard"
   | "createList"
   | "history"
-  | "logout";
+  | "logout"
+  | "resetPassword"
+  | "sendResetLink"
+  | "resetPasswordTitle"
+  | "enterResetEmail"
+  | "checkEmail"
+  | "resetEmailSent"
+  | "newPassword"
+  | "confirmNewPassword"
+  | "updatePassword"
+  | "backToLogin";
 
 type Translations = {
   [key in TranslationKey]: {
@@ -283,6 +292,46 @@ export const translations: Translations = {
   logout: {
     en: "Logout",
     bn: "লগআউট"
+  },
+  resetPassword: {
+    en: "Reset Password",
+    bn: "পাসওয়ার্ড রিসেট করুন"
+  },
+  sendResetLink: {
+    en: "Send Reset Link",
+    bn: "রিসেট লিঙ্ক পাঠান"
+  },
+  resetPasswordTitle: {
+    en: "Reset Your Password",
+    bn: "আপনার পাসওয়ার্ড রিসেট করুন"
+  },
+  enterResetEmail: {
+    en: "Enter your email and we'll send you a link to reset your password",
+    bn: "আপনার ইমেল লিখুন এবং আমরা আপনাকে পাসওয়ার্ড রিসেট করার লিঙ্ক পাঠাব"
+  },
+  checkEmail: {
+    en: "Check Your Email",
+    bn: "আপনার ইমেল চেক করুন"
+  },
+  resetEmailSent: {
+    en: "We've sent a password reset link to your email. Please check your inbox.",
+    bn: "আমরা আপনার ইমেলে একটি পাসওয়ার্ড রিসেট লিঙ্ক পাঠিয়েছি। অনুগ্রহ করে আপনার ইনবক্স চেক করুন।"
+  },
+  newPassword: {
+    en: "New Password",
+    bn: "নতুন পাসওয়ার্ড"
+  },
+  confirmNewPassword: {
+    en: "Confirm New Password",
+    bn: "নতুন পাসওয়ার্ড নিশ্চিত করুন"
+  },
+  updatePassword: {
+    en: "Update Password",
+    bn: "পাসওয়ার্ড আপডেট করুন"
+  },
+  backToLogin: {
+    en: "Back to Login",
+    bn: "লগইনে ফিরে যান"
   }
 };
 

@@ -1,19 +1,18 @@
 
 import { createContext, useState, useContext, useEffect, ReactNode } from "react";
 import { toast } from "@/components/ui/use-toast";
-
-interface User {
-  id: string;
-  email: string;
-  name: string;
-}
+import { supabase } from "@/integrations/supabase/client";
+import { User, Session } from "@supabase/supabase-js";
+import { useNavigate } from "react-router-dom";
 
 interface AuthContextType {
   user: User | null;
+  session: Session | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<boolean>;
   register: (name: string, email: string, password: string) => Promise<boolean>;
-  logout: () => void;
+  logout: () => Promise<void>;
+  resetPassword: (email: string) => Promise<boolean>;
   isAuthenticated: boolean;
 }
 
@@ -33,42 +32,53 @@ interface AuthProviderProps {
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check for existing user in localStorage (in real app, this would validate token)
-    const storedUser = localStorage.getItem("bazarUser");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    setIsLoading(false);
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        if (event === 'SIGNED_OUT') {
+          setSession(null);
+          setUser(null);
+        }
+      }
+    );
+
+    // THEN check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setIsLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const login = async (email: string, password: string) => {
     try {
       setIsLoading(true);
-      // This is a mock login - in a real app this would call an API
-      // Normally this would validate against your backend
-      if (email && password) {
-        const mockUser = {
-          id: crypto.randomUUID(),
-          email,
-          name: email.split('@')[0]
-        };
-        
-        setUser(mockUser);
-        localStorage.setItem("bazarUser", JSON.stringify(mockUser));
-        toast({
-          title: "Login successful",
-          description: "Welcome back to Bazar Buddy!",
-        });
-        return true;
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        throw error;
       }
-      throw new Error("Invalid credentials");
-    } catch (error) {
+
+      toast({
+        title: "Login successful",
+        description: "Welcome back to Bazar Buddy!",
+      });
+      return true;
+    } catch (error: any) {
       toast({
         title: "Login failed",
-        description: error instanceof Error ? error.message : "Please check your credentials and try again",
+        description: error.message || "Please check your credentials and try again",
         variant: "destructive",
       });
       return false;
@@ -80,27 +90,29 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const register = async (name: string, email: string, password: string) => {
     try {
       setIsLoading(true);
-      // This is a mock registration - in a real app this would call an API
-      if (name && email && password) {
-        const mockUser = {
-          id: crypto.randomUUID(),
-          email,
-          name
-        };
-        
-        setUser(mockUser);
-        localStorage.setItem("bazarUser", JSON.stringify(mockUser));
-        toast({
-          title: "Registration successful",
-          description: "Welcome to Bazar Buddy!",
-        });
-        return true;
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: name,
+          },
+        },
+      });
+
+      if (error) {
+        throw error;
       }
-      throw new Error("Please complete all fields");
-    } catch (error) {
+
+      toast({
+        title: "Registration successful",
+        description: "Welcome to Bazar Buddy! Please check your email for verification.",
+      });
+      return true;
+    } catch (error: any) {
       toast({
         title: "Registration failed",
-        description: error instanceof Error ? error.message : "An error occurred during registration",
+        description: error.message || "An error occurred during registration",
         variant: "destructive",
       });
       return false;
@@ -109,22 +121,62 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem("bazarUser");
-    toast({
-      title: "Logged out",
-      description: "You have been successfully logged out",
-    });
+  const resetPassword = async (email: string) => {
+    try {
+      setIsLoading(true);
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "Password reset email sent",
+        description: "Check your email for the password reset link",
+      });
+      return true;
+    } catch (error: any) {
+      toast({
+        title: "Failed to send reset email",
+        description: error.message || "An error occurred",
+        variant: "destructive",
+      });
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const logout = async () => {
+    try {
+      setIsLoading(true);
+      await supabase.auth.signOut();
+      toast({
+        title: "Logged out",
+        description: "You have been successfully logged out",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Logout failed",
+        description: error.message || "An error occurred during logout",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const value = {
     user,
+    session,
     isLoading,
     login,
     register,
     logout,
-    isAuthenticated: !!user,
+    resetPassword,
+    isAuthenticated: !!session,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
