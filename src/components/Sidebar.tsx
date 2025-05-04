@@ -48,9 +48,7 @@ export function Sidebar({
           <User size={16} />
         </div>
         <div className="flex flex-col">
-          <span className="text-lg font-semibold tracking-tight text-sidebar-foreground">
-            Bazar Buddy
-          </span>
+          <span className="text-lg font-semibold tracking-tight text-sidebar-foreground">BazarBuddy</span>
           <span className="text-xs text-sidebar-foreground/60">Family Grocery management</span>
         </div>
       </div>
