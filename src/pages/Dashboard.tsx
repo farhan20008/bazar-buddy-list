@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGrocery } from "@/contexts/GroceryContext";
@@ -14,53 +15,53 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { getText } from "@/utils/translations";
 
 const Dashboard = () => {
-  const {
-    lists
-  } = useGrocery();
-  const {
-    user
-  } = useAuth();
+  const { lists } = useGrocery();
+  const { user } = useAuth();
   const { language, isEnglish } = useLanguage();
   const navigate = useNavigate();
   const [chartData, setChartData] = useState<any[]>([]);
 
-  // Generate chart data based on last 6 months of grocery lists
-  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-  const currentDate = new Date();
-  const currentMonth = currentDate.getMonth();
-  const currentYear = currentDate.getFullYear();
-  const last6Months = Array.from({
-    length: 6
-  }, (_, i) => {
-    const monthIndex = (currentMonth - i + 12) % 12;
-    return {
-      month: months[monthIndex],
-      year: currentMonth - i < 0 ? currentYear - 1 : currentYear
-    };
-  }).reverse();
-  const chartData = last6Months.map(({
-    month,
-    year
-  }) => {
-    // Find lists for this month/year
-    const matchingLists = lists.filter(list => list.month === month && list.year === year);
+  useEffect(() => {
+    // Generate chart data based on last 6 months of grocery lists
+    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth();
+    const currentYear = currentDate.getFullYear();
+    
+    const last6Months = Array.from({ length: 6 }, (_, i) => {
+      const monthIndex = (currentMonth - i + 12) % 12;
+      return {
+        month: months[monthIndex],
+        year: currentMonth - i < 0 ? currentYear - 1 : currentYear
+      };
+    }).reverse();
+    
+    const newChartData = last6Months.map(({ month, year }) => {
+      // Find lists for this month/year
+      const matchingLists = lists.filter(list => list.month === month && list.year === year);
 
-    // Calculate total spent for month
-    const totalSpent = matchingLists.reduce((total, list) => total + list.totalEstimatedPrice, 0);
+      // Calculate total spent for month
+      const totalSpent = matchingLists.reduce((total, list) => total + list.totalEstimatedPrice, 0);
 
-    // Generate some random secondary value for visualization
-    const secondaryValue = totalSpent > 0 ? totalSpent * (0.8 + Math.random() * 0.4) : Math.floor(Math.random() * 100) + 50;
-    return {
-      name: month.substring(0, 3),
-      value: Math.round(totalSpent * 100) / 100,
-      secondaryValue: Math.round(secondaryValue * 100) / 100
-    };
-  });
-  setChartData(chartData);
-}, [lists]);
+      // Generate some random secondary value for visualization
+      const secondaryValue = totalSpent > 0 
+        ? totalSpent * (0.8 + Math.random() * 0.4) 
+        : Math.floor(Math.random() * 100) + 50;
+        
+      return {
+        name: month.substring(0, 3),
+        value: Math.round(totalSpent * 100) / 100,
+        secondaryValue: Math.round(secondaryValue * 100) / 100
+      };
+    });
+    
+    setChartData(newChartData);
+  }, [lists]);
 
   // Get most recent list
-  const latestList = lists.length > 0 ? [...lists].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0] : null;
+  const latestList = lists.length > 0 
+    ? [...lists].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0] 
+    : null;
 
   // Calculate metrics
   const totalLists = lists.length;
