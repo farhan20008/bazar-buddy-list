@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useGrocery } from "@/contexts/GroceryContext";
@@ -6,57 +5,36 @@ import { DashboardLayout } from "@/components/DashboardLayout";
 import { GroceryItemForm } from "@/components/GroceryItemForm";
 import { GroceryItemTable } from "@/components/GroceryItemTable";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  CardFooter,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { ArrowLeft, Loader2, Save, Trash } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
-
-const MONTHS = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December"
-];
-
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const CURRENT_YEAR = new Date().getFullYear();
-const YEARS = Array.from({ length: 5 }, (_, i) => CURRENT_YEAR + i);
-
+const YEARS = Array.from({
+  length: 5
+}, (_, i) => CURRENT_YEAR + i);
 const EditList = () => {
-  const { id } = useParams<{ id: string }>();
+  const {
+    id
+  } = useParams<{
+    id: string;
+  }>();
   const navigate = useNavigate();
-  const { getListById, updateList, deleteList } = useGrocery();
-  
+  const {
+    getListById,
+    updateList,
+    deleteList
+  } = useGrocery();
   const [title, setTitle] = useState("");
   const [selectedMonth, setSelectedMonth] = useState("");
   const [selectedYear, setSelectedYear] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [listExists, setListExists] = useState(false);
-
   useEffect(() => {
     if (id) {
       const list = getListById(id);
@@ -69,76 +47,62 @@ const EditList = () => {
         toast({
           title: "List Not Found",
           description: "The grocery list you're looking for doesn't exist.",
-          variant: "destructive",
+          variant: "destructive"
         });
         navigate("/dashboard");
       }
     }
     setIsLoading(false);
   }, [id, getListById, navigate]);
-
   const handleUpdateList = () => {
     if (!id) return;
-    
     if (!title) {
       toast({
         title: "Missing Information",
         description: "Please provide a title for your grocery list.",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
-
     setIsSaving(true);
-
     try {
       updateList(id, {
         title,
         month: selectedMonth,
-        year: parseInt(selectedYear),
+        year: parseInt(selectedYear)
       });
-      
       toast({
         title: "List Updated",
-        description: "Your grocery list has been updated successfully.",
+        description: "Your grocery list has been updated successfully."
       });
-      
       setIsSaving(false);
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to update the grocery list. Please try again.",
-        variant: "destructive",
+        variant: "destructive"
       });
       setIsSaving(false);
     }
   };
-
   const handleDeleteList = () => {
     if (id) {
       deleteList(id);
       navigate("/dashboard");
     }
   };
-
   if (isLoading) {
-    return (
-      <DashboardLayout>
+    return <DashboardLayout>
         <div className="flex justify-center items-center h-[50vh]">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
-      </DashboardLayout>
-    );
+      </DashboardLayout>;
   }
-
   if (!listExists) {
     return null;
   }
-
   const list = getListById(id!);
-
-  return (
-    <DashboardLayout>
+  return <DashboardLayout>
       <div className="flex items-center gap-2 mb-6">
         <Button variant="outline" size="icon" onClick={() => navigate(-1)}>
           <ArrowLeft className="h-4 w-4" />
@@ -186,69 +150,46 @@ const EditList = () => {
           <CardContent className="space-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="title">List Title</Label>
-              <Input
-                id="title"
-                placeholder="April Groceries"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-              />
+              <Input id="title" placeholder="April Groceries" value={title} onChange={e => setTitle(e.target.value)} />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label htmlFor="month">Month</Label>
-                <Select
-                  value={selectedMonth}
-                  onValueChange={setSelectedMonth}
-                >
+                <Select value={selectedMonth} onValueChange={setSelectedMonth}>
                   <SelectTrigger id="month">
                     <SelectValue placeholder="Select month" />
                   </SelectTrigger>
                   <SelectContent position="popper">
-                    {MONTHS.map((month) => (
-                      <SelectItem key={month} value={month}>
+                    {MONTHS.map(month => <SelectItem key={month} value={month}>
                         {month}
-                      </SelectItem>
-                    ))}
+                      </SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="year">Year</Label>
-                <Select
-                  value={selectedYear}
-                  onValueChange={setSelectedYear}
-                >
+                <Select value={selectedYear} onValueChange={setSelectedYear}>
                   <SelectTrigger id="year">
                     <SelectValue placeholder="Select year" />
                   </SelectTrigger>
                   <SelectContent position="popper">
-                    {YEARS.map((year) => (
-                      <SelectItem key={year.toString()} value={year.toString()}>
+                    {YEARS.map(year => <SelectItem key={year.toString()} value={year.toString()}>
                         {year}
-                      </SelectItem>
-                    ))}
+                      </SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
             </div>
           </CardContent>
           <CardFooter>
-            <Button
-              className="w-full"
-              onClick={handleUpdateList}
-              disabled={isSaving}
-            >
-              {isSaving ? (
-                <>
+            <Button onClick={handleUpdateList} disabled={isSaving} className="w-full bg-orange-600 hover:bg-orange-500 text-gray-50">
+              {isSaving ? <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Saving
-                </>
-              ) : (
-                <>
+                </> : <>
                   <Save className="mr-2 h-4 w-4" />
                   Save Changes
-                </>
-              )}
+                </>}
             </Button>
           </CardFooter>
         </Card>
@@ -280,8 +221,6 @@ const EditList = () => {
           {list && <GroceryItemTable listId={id!} items={list.items} />}
         </CardContent>
       </Card>
-    </DashboardLayout>
-  );
+    </DashboardLayout>;
 };
-
 export default EditList;
