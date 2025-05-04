@@ -125,7 +125,7 @@ const CreateList = () => {
                 </Select>
               </div>
             </div>
-            <Button onClick={handleCreateList} disabled={isSaving} className="w-full bg-orange-600 hover:bg-orange-500">
+            <Button onClick={handleCreateList} disabled={isSaving} className="w-full bg-orange-600 hover:bg-orange-500 text-gray-50">
               {isSaving ? <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Saving
