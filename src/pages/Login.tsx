@@ -1,4 +1,3 @@
-
 import { useState, FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -8,14 +7,18 @@ import { Label } from "@/components/ui/label";
 import { Loader2, User } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { getText } from "@/utils/translations";
-
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { login, isAuthenticated } = useAuth();
+  const {
+    login,
+    isAuthenticated
+  } = useAuth();
   const navigate = useNavigate();
-  const { language } = useLanguage();
+  const {
+    language
+  } = useLanguage();
 
   // Redirect if already authenticated
   useState(() => {
@@ -23,11 +26,9 @@ const Login = () => {
       navigate("/dashboard");
     }
   });
-
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
     try {
       const success = await login(email, password);
       if (success) {
@@ -37,9 +38,7 @@ const Login = () => {
       setIsSubmitting(false);
     }
   };
-
-  return (
-    <div className="min-h-screen grid md:grid-cols-2">
+  return <div className="min-h-screen grid md:grid-cols-2">
       <div className="flex flex-col justify-center items-start p-8 md:p-12 lg:p-16 xl:p-24">
         <div className="mx-auto w-full max-w-sm space-y-6">
           <div className="space-y-2 text-left">
@@ -57,42 +56,22 @@ const Login = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">{getText("email", language)}</Label>
-              <Input
-                id="email"
-                placeholder="m@example.com"
-                required
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
+              <Input id="email" placeholder="m@example.com" required type="email" value={email} onChange={e => setEmail(e.target.value)} />
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">{getText("password", language)}</Label>
-                <Link
-                  to="/forgot-password"
-                  className="text-sm text-muted-foreground hover:text-primary"
-                >
+                <Link to="/forgot-password" className="text-sm text-muted-foreground hover:text-primary">
                   {getText("forgotPassword", language)}
                 </Link>
               </div>
-              <Input
-                id="password"
-                required
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
+              <Input id="password" required type="password" value={password} onChange={e => setPassword(e.target.value)} />
             </div>
-            <Button className="w-full" type="submit" disabled={isSubmitting}>
-              {isSubmitting ? (
-                <>
+            <Button type="submit" disabled={isSubmitting} className="w-full bg-orange-600 hover:bg-orange-500 text-zinc-50">
+              {isSubmitting ? <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Please wait
-                </>
-              ) : (
-                getText("login", language)
-              )}
+                </> : getText("login", language)}
             </Button>
           </form>
           <div className="text-center text-sm">
@@ -106,8 +85,6 @@ const Login = () => {
       <div className="hidden md:block bg-zinc-900 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-background/0"></div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Login;
