@@ -13,7 +13,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
   return (
     <div className={`flex min-h-screen w-full bg-background ${fontClass}`}>
-      <Sidebar />
+      <Sidebar className="flex-shrink-0" />
       <main className="flex-1 overflow-y-auto">
         <div className="container px-4 py-6 md:px-6 md:py-8">
           {children}

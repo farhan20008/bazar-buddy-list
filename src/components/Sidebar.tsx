@@ -3,24 +3,14 @@ import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { LayoutDashboard, ListMusic, LogOut, Menu, PlusCircle, User, X } from "lucide-react";
-import { getText } from "@/utils/translations";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
+import { LayoutDashboard, PlusCircle, ListMusic, LogOut, Menu, X, User } from "lucide-react";
+import { Button } from "./ui/button";
+import { Separator } from "./ui/separator";
+import { Avatar, AvatarFallback } from "./ui/avatar";
+import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import { toast } from "@/components/ui/use-toast";
-import {
-  Sidebar as ShadcnSidebar, 
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarProvider,
-  useSidebar
-} from "@/components/ui/sidebar";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { getText } from "@/utils/translations";
 
 interface SidebarProps {
   className?: string;
@@ -64,94 +54,73 @@ export function Sidebar({ className }: SidebarProps) {
     }
   ];
 
-  // Create the sidebar content component - using CustomSidebarContent name to avoid conflicts
-  const CustomSidebarContent = () => {
-    const { state } = useSidebar();
-    
-    return (
-      <ShadcnSidebar>
-        <SidebarHeader>
-          <div className="flex items-center gap-2 px-2 py-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg text-primary-foreground bg-orange-600">
-              <User size={16} />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-lg font-semibold tracking-tight text-sidebar-foreground">
-                BazarBuddy
-              </span>
-              {state !== "collapsed" && (
-                <span className="text-xs text-sidebar-foreground/60">
-                  Family Grocery management
-                </span>
-              )}
-            </div>
-          </div>
-          <Separator className="mb-2" />
-        </SidebarHeader>
-        
-        <SidebarContent>
-          <SidebarMenu>
-            {sidebarLinks.map(link => (
-              <SidebarMenuItem key={link.href}>
-                <SidebarMenuButton 
-                  asChild 
-                  tooltip={link.name}
-                  isActive={location.pathname === link.href}
-                >
-                  <a 
-                    href={link.href}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      navigate(link.href);
-                      setOpen(false);
-                    }}
-                  >
-                    {link.icon}
-                    <span>{link.name}</span>
-                  </a>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
-        </SidebarContent>
-        
-        <SidebarFooter>
-          <div className="flex items-center justify-between p-3">
-            <div className="flex items-center gap-3">
-              <Avatar className="h-9 w-9">
-                <AvatarFallback className="bg-primary/10 text-sidebar-foreground">
-                  {userInitial}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex flex-col">
-                <span className="text-sm font-medium text-sidebar-foreground">
-                  {userName}
-                </span>
-                <span className="text-xs text-sidebar-foreground/60">
-                  {user?.email || "user@example.com"}
-                </span>
-              </div>
-            </div>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={onLogout} 
-              className="text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-              aria-label={getText("logout", language)}
+  const SidebarContent = () => (
+    <div className="flex h-screen flex-col border-r bg-sidebar pt-2">
+      <div className="flex items-center gap-2 px-4 py-3">
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg text-primary-foreground bg-orange-600">
+          <User size={16} />
+        </div>
+        <div className="flex flex-col">
+          <span className="text-lg font-semibold tracking-tight text-sidebar-foreground">BazarBuddy</span>
+          <span className="text-xs text-sidebar-foreground/60">Family Grocery management</span>
+        </div>
+      </div>
+      <Separator className="my-2" />
+      <div className="flex-1 px-1 py-2">
+        <nav className="flex flex-col gap-1">
+          {sidebarLinks.map(link => (
+            <a 
+              key={link.href} 
+              href={link.href} 
+              onClick={e => {
+                e.preventDefault();
+                navigate(link.href);
+                setOpen(false);
+              }} 
+              className={cn("sidebar-item", location.pathname === link.href && "active")}
             >
-              <LogOut size={18} />
-            </Button>
+              {link.icon}
+              {link.name}
+            </a>
+          ))}
+        </nav>
+      </div>
+      <div className="sticky bottom-0 border-t border-sidebar-border bg-sidebar p-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Avatar className="h-9 w-9">
+              <AvatarFallback className="bg-primary/10 text-sidebar-foreground">
+                {userInitial}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex flex-col">
+              <span className="text-sm font-medium text-sidebar-foreground">
+                {userName}
+              </span>
+              <span className="text-xs text-sidebar-foreground/60">
+                {user?.email || "user@example.com"}
+              </span>
+            </div>
           </div>
-        </SidebarFooter>
-      </ShadcnSidebar>
-    );
-  };
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={onLogout} 
+            className="text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+            aria-label={getText("logout", language)}
+          >
+            <LogOut size={18} />
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
 
   // Mobile sidebar using Sheet component
   return (
-    <SidebarProvider>
-      <div className="hidden md:block h-screen">
-        <CustomSidebarContent />
+    <>
+      <div className={cn("hidden h-screen w-64 md:block", className)}>
+        <SidebarContent />
       </div>
       <div className="md:hidden">
         <Sheet open={open} onOpenChange={setOpen}>
@@ -167,7 +136,7 @@ export function Sidebar({ className }: SidebarProps) {
                 <User size={16} />
               </div>
               <span className="text-lg font-semibold tracking-tight">
-                BazarBuddy
+                Bazar Buddy
               </span>
             </div>
           </div>
@@ -176,10 +145,10 @@ export function Sidebar({ className }: SidebarProps) {
               <X className="h-5 w-5" />
               <span className="sr-only">Close sidebar</span>
             </Button>
-            <CustomSidebarContent />
+            <SidebarContent />
           </SheetContent>
         </Sheet>
       </div>
-    </SidebarProvider>
+    </>
   );
 }
