@@ -10,14 +10,14 @@ import { AreaChart } from "@/components/AreaChart";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { BarChart, Clock, DollarSign, Plus, ShoppingCart } from "lucide-react";
+import { BarChart, Clock, DollarSign, Loader2, Plus, ShoppingCart } from "lucide-react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { getText } from "@/utils/translations";
 
 const Dashboard = () => {
-  const { lists } = useGrocery();
+  const { lists, isLoading } = useGrocery();
   const { user } = useAuth();
-  const { language, isEnglish } = useLanguage();
+  const { language } = useLanguage();
   const navigate = useNavigate();
   const [chartData, setChartData] = useState<any[]>([]);
   
@@ -61,16 +61,21 @@ const Dashboard = () => {
     setChartData(newChartData);
   }, [lists]);
 
-  // Get most recent list
-  const latestList = lists.length > 0 
-    ? [...lists].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0] 
-    : null;
-
   // Calculate metrics
   const totalLists = lists.length;
   const totalItems = lists.reduce((count, list) => count + list.items.length, 0);
   const totalSpent = lists.reduce((total, list) => total + list.totalEstimatedPrice, 0);
   const avgSpentPerList = totalLists > 0 ? totalSpent / totalLists : 0;
+
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <div className="flex justify-center items-center h-[50vh]">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>

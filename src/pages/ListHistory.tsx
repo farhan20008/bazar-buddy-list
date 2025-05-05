@@ -21,11 +21,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Calendar, Search, ShoppingCart } from "lucide-react";
+import { Calendar, Download, Loader2, Search, ShoppingCart } from "lucide-react";
 import { getText } from "@/utils/translations";
 
 const ListHistory = () => {
-  const { lists } = useGrocery();
+  const { lists, isLoading, downloadListAsPdf } = useGrocery();
   const { language } = useLanguage();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
@@ -40,6 +40,25 @@ const ListHistory = () => {
     .sort(
       (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
+    
+  const handleDownloadPdf = async (id: string, event: React.MouseEvent) => {
+    event.stopPropagation();
+    try {
+      await downloadListAsPdf(id);
+    } catch (error) {
+      console.error("Error downloading PDF:", error);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <div className="flex justify-center items-center h-[50vh]">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
@@ -105,6 +124,7 @@ const ListHistory = () => {
                     <TableHead>{getText("items", language)}</TableHead>
                     <TableHead className="text-right">{getText("estCost", language)}</TableHead>
                     <TableHead className="text-right">{getText("createdOn", language)}</TableHead>
+                    <TableHead className="w-[50px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -129,6 +149,17 @@ const ListHistory = () => {
                         </TableCell>
                         <TableCell className="text-right text-muted-foreground">
                           {createdDate.toLocaleDateString()}
+                        </TableCell>
+                        <TableCell>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={(e) => handleDownloadPdf(list.id, e)}
+                            className="h-8 px-2"
+                          >
+                            <Download className="h-4 w-4" />
+                            <span className="sr-only">Download PDF</span>
+                          </Button>
                         </TableCell>
                       </TableRow>
                     );

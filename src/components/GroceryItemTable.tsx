@@ -34,9 +34,10 @@ interface GroceryItemTableProps {
   listId: string;
   items: GroceryItem[];
   onDelete?: (id: string) => void;
+  isCreatePage?: boolean;
 }
 
-export function GroceryItemTable({ listId, items, onDelete }: GroceryItemTableProps) {
+export function GroceryItemTable({ listId, items, onDelete, isCreatePage = false }: GroceryItemTableProps) {
   const { removeItemFromList } = useGrocery();
   const [editItem, setEditItem] = useState<GroceryItem | null>(null);
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
@@ -45,12 +46,17 @@ export function GroceryItemTable({ listId, items, onDelete }: GroceryItemTablePr
     setEditItem(item);
   };
 
-  const handleDelete = (itemId: string) => {
+  const handleDelete = async (itemId: string) => {
     setItemToDelete(null);
-    if (onDelete) {
+    
+    if (isCreatePage && onDelete) {
       onDelete(itemId);
     } else {
-      removeItemFromList(listId, itemId);
+      try {
+        await removeItemFromList(listId, itemId);
+      } catch (error) {
+        console.error("Error deleting item:", error);
+      }
     }
   };
 
@@ -117,6 +123,7 @@ export function GroceryItemTable({ listId, items, onDelete }: GroceryItemTablePr
               listId={listId}
               item={editItem}
               onSubmit={() => setEditItem(null)}
+              isCreatePage={isCreatePage}
             />
           )}
         </DialogContent>

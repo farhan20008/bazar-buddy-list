@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useGrocery } from "@/contexts/GroceryContext";
@@ -10,13 +11,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { ArrowLeft, Loader2, Save, Trash } from "lucide-react";
+import { ArrowLeft, Download, Loader2, Save, Trash } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
+
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({
   length: 5
 }, (_, i) => CURRENT_YEAR + i);
+
 const EditList = () => {
   const {
     id
@@ -27,14 +30,17 @@ const EditList = () => {
   const {
     getListById,
     updateList,
-    deleteList
+    deleteList,
+    downloadListAsPdf,
+    isLoading
   } = useGrocery();
+  
   const [title, setTitle] = useState("");
   const [selectedMonth, setSelectedMonth] = useState("");
   const [selectedYear, setSelectedYear] = useState("");
-  const [isSaving, setIsSaving] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [localLoading, setLocalLoading] = useState(true);
   const [listExists, setListExists] = useState(false);
+  
   useEffect(() => {
     if (id) {
       const list = getListById(id);
@@ -52,9 +58,10 @@ const EditList = () => {
         navigate("/dashboard");
       }
     }
-    setIsLoading(false);
+    setLocalLoading(false);
   }, [id, getListById, navigate]);
-  const handleUpdateList = () => {
+  
+  const handleUpdateList = async () => {
     if (!id) return;
     if (!title) {
       toast({
@@ -64,44 +71,56 @@ const EditList = () => {
       });
       return;
     }
-    setIsSaving(true);
+    
     try {
-      updateList(id, {
+      await updateList(id, {
         title,
         month: selectedMonth,
         year: parseInt(selectedYear)
       });
-      toast({
-        title: "List Updated",
-        description: "Your grocery list has been updated successfully."
-      });
-      setIsSaving(false);
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update the grocery list. Please try again.",
-        variant: "destructive"
-      });
-      setIsSaving(false);
+      console.error("Error updating list:", error);
+      // Error is already handled in the context
     }
   };
-  const handleDeleteList = () => {
+  
+  const handleDeleteList = async () => {
     if (id) {
-      deleteList(id);
-      navigate("/dashboard");
+      try {
+        await deleteList(id);
+        navigate("/dashboard");
+      } catch (error) {
+        console.error("Error deleting list:", error);
+        // Error is already handled in the context
+      }
     }
   };
-  if (isLoading) {
+  
+  const handleDownloadPdf = async () => {
+    if (id) {
+      try {
+        await downloadListAsPdf(id);
+      } catch (error) {
+        console.error("Error downloading PDF:", error);
+        // Error is already handled in the context
+      }
+    }
+  };
+  
+  if (localLoading || isLoading) {
     return <DashboardLayout>
         <div className="flex justify-center items-center h-[50vh]">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       </DashboardLayout>;
   }
+  
   if (!listExists) {
     return null;
   }
+  
   const list = getListById(id!);
+  
   return <DashboardLayout>
       <div className="flex items-center gap-2 mb-6">
         <Button variant="outline" size="icon" onClick={() => navigate(-1)}>
@@ -113,29 +132,35 @@ const EditList = () => {
             {selectedMonth} {selectedYear} • {list?.items.length || 0} items
           </p>
         </div>
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button variant="destructive">
-              <Trash className="h-4 w-4 mr-2" />
-              Delete List
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This will permanently delete your "{title}" grocery list and all its items.
-                This action cannot be undone.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={handleDeleteList} className="bg-destructive text-destructive-foreground">
-                Delete
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleDownloadPdf} disabled={isLoading}>
+            <Download className="h-4 w-4 mr-2" />
+            Download PDF
+          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive">
+                <Trash className="h-4 w-4 mr-2" />
+                Delete List
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will permanently delete your "{title}" grocery list and all its items.
+                  This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDeleteList} className="bg-destructive text-destructive-foreground">
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
@@ -182,8 +207,8 @@ const EditList = () => {
             </div>
           </CardContent>
           <CardFooter>
-            <Button onClick={handleUpdateList} disabled={isSaving} className="w-full bg-orange-600 hover:bg-orange-500 text-gray-50">
-              {isSaving ? <>
+            <Button onClick={handleUpdateList} disabled={isLoading} className="w-full bg-orange-600 hover:bg-orange-500 text-gray-50">
+              {isLoading ? <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Saving
                 </> : <>
@@ -223,4 +248,5 @@ const EditList = () => {
       </Card>
     </DashboardLayout>;
 };
+
 export default EditList;

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGrocery, GroceryItem } from "@/contexts/GroceryContext";
@@ -11,15 +12,18 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, Loader2, Save } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
+
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({
   length: 5
 }, (_, i) => CURRENT_YEAR + i);
+
 const CreateList = () => {
   const navigate = useNavigate();
   const {
-    createList
+    createList,
+    isLoading
   } = useGrocery();
   const currentMonth = new Date().getMonth(); // 0-indexed
 
@@ -27,8 +31,8 @@ const CreateList = () => {
   const [selectedMonth, setSelectedMonth] = useState(MONTHS[currentMonth]);
   const [selectedYear, setSelectedYear] = useState(CURRENT_YEAR.toString());
   const [items, setItems] = useState<GroceryItem[]>([]);
-  const [isSaving, setIsSaving] = useState(false);
-  const handleCreateList = () => {
+  
+  const handleCreateList = async () => {
     if (!title) {
       toast({
         title: "Missing Information",
@@ -45,31 +49,32 @@ const CreateList = () => {
       });
       return;
     }
-    setIsSaving(true);
+    
     try {
-      createList({
+      const listId = await createList({
         title,
         month: selectedMonth,
         year: parseInt(selectedYear),
         items
       });
-      navigate("/dashboard");
+      
+      navigate(`/edit-list/${listId}`);
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to create the grocery list. Please try again.",
-        variant: "destructive"
-      });
-      setIsSaving(false);
+      console.error("Error creating list:", error);
+      // Error is already handled in the context
     }
   };
+  
   const addItemToList = (item: GroceryItem) => {
     setItems([...items, item]);
   };
+  
   const removeItemFromList = (id: string) => {
     setItems(items.filter(item => item.id !== id));
   };
+  
   const tempListId = "temp-new-list";
+  
   return <DashboardLayout>
       <div className="flex items-center gap-2 mb-6">
         <Button variant="outline" size="icon" onClick={() => navigate(-1)}>
@@ -125,8 +130,8 @@ const CreateList = () => {
                 </Select>
               </div>
             </div>
-            <Button onClick={handleCreateList} disabled={isSaving} className="w-full bg-orange-600 hover:bg-orange-500 text-gray-50">
-              {isSaving ? <>
+            <Button onClick={handleCreateList} disabled={isLoading} className="w-full bg-orange-600 hover:bg-orange-500 text-gray-50">
+              {isLoading ? <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Saving
                 </> : <>
@@ -146,7 +151,11 @@ const CreateList = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <GroceryItemForm listId={tempListId} onSubmit={newItem => newItem && addItemToList(newItem)} />
+            <GroceryItemForm 
+              listId={tempListId} 
+              onSubmit={newItem => newItem && addItemToList(newItem)} 
+              isCreatePage={true} 
+            />
           </CardContent>
         </Card>
       </div>
@@ -161,9 +170,10 @@ const CreateList = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <GroceryItemTable listId={tempListId} items={items} onDelete={removeItemFromList} />
+          <GroceryItemTable listId={tempListId} items={items} onDelete={removeItemFromList} isCreatePage={true} />
         </CardContent>
       </Card>
     </DashboardLayout>;
 };
+
 export default CreateList;

@@ -9,6 +9,74 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      grocery_items: {
+        Row: {
+          created_at: string
+          estimated_price: number | null
+          id: string
+          list_id: string | null
+          name: string
+          quantity: number
+          unit: string
+        }
+        Insert: {
+          created_at?: string
+          estimated_price?: number | null
+          id?: string
+          list_id?: string | null
+          name: string
+          quantity: number
+          unit: string
+        }
+        Update: {
+          created_at?: string
+          estimated_price?: number | null
+          id?: string
+          list_id?: string | null
+          name?: string
+          quantity?: number
+          unit?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "grocery_items_list_id_fkey"
+            columns: ["list_id"]
+            isOneToOne: false
+            referencedRelation: "grocery_lists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      grocery_lists: {
+        Row: {
+          created_at: string
+          id: string
+          month: string
+          title: string
+          total_estimated_price: number
+          user_id: string
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          month: string
+          title: string
+          total_estimated_price?: number
+          user_id: string
+          year: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          month?: string
+          title?: string
+          total_estimated_price?: number
+          user_id?: string
+          year?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
