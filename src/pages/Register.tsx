@@ -82,7 +82,7 @@ const Register = () => {
             }} />
               {passwordError && <p className="text-sm text-destructive">{passwordError}</p>}
             </div>
-            <Button className="w-full" type="submit" disabled={isSubmitting}>
+            <Button type="submit" disabled={isSubmitting} className="w-full bg-orange-600 hover:bg-orange-500 text-gray-50">
               {isSubmitting ? <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Creating account
