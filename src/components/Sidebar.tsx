@@ -64,7 +64,8 @@ export function Sidebar({ className }: SidebarProps) {
     }
   ];
 
-  const SidebarContent = () => {
+  // Create the sidebar content component
+  const SidebarContents = () => {
     const { state } = useSidebar();
     
     return (
@@ -150,7 +151,7 @@ export function Sidebar({ className }: SidebarProps) {
   return (
     <SidebarProvider>
       <div className="hidden md:block h-screen">
-        <SidebarContent />
+        <SidebarContents />
       </div>
       <div className="md:hidden">
         <Sheet open={open} onOpenChange={setOpen}>
@@ -175,7 +176,7 @@ export function Sidebar({ className }: SidebarProps) {
               <X className="h-5 w-5" />
               <span className="sr-only">Close sidebar</span>
             </Button>
-            <SidebarContent />
+            <SidebarContents />
           </SheetContent>
         </Sheet>
       </div>
