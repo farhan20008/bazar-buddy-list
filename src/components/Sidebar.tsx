@@ -22,6 +22,10 @@ export function Sidebar({ className }: SidebarProps) {
   const { language } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
+  
+  // Get user's name from metadata or use email as fallback
+  const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || "User";
+  const userInitial = userName.charAt(0).toUpperCase();
 
   const onLogout = () => {
     logout();
@@ -86,12 +90,12 @@ export function Sidebar({ className }: SidebarProps) {
           <div className="flex items-center gap-3">
             <Avatar className="h-9 w-9">
               <AvatarFallback className="bg-primary/10 text-sidebar-foreground">
-                {user?.name?.charAt(0).toUpperCase() || "U"}
+                {userInitial}
               </AvatarFallback>
             </Avatar>
             <div className="flex flex-col">
               <span className="text-sm font-medium text-sidebar-foreground">
-                {user?.name || "User"}
+                {userName}
               </span>
               <span className="text-xs text-sidebar-foreground/60">
                 {user?.email || "user@example.com"}

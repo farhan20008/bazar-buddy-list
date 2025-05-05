@@ -20,6 +20,9 @@ const Dashboard = () => {
   const { language, isEnglish } = useLanguage();
   const navigate = useNavigate();
   const [chartData, setChartData] = useState<any[]>([]);
+  
+  // Get user's name from metadata or use email as fallback
+  const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || "User";
 
   useEffect(() => {
     // Generate chart data based on last 6 months of grocery lists
@@ -78,7 +81,7 @@ const Dashboard = () => {
               {getText("dashboardTitle", language)}
             </h1>
             <p className="text-muted-foreground">
-              {getText("welcome", language)} {user?.name || "User"}
+              {getText("welcome", language)} {userName}
             </p>
           </div>
           <div className="flex items-center gap-4">
