@@ -43,7 +43,7 @@ const Login = () => {
         <div className="mx-auto w-full max-w-sm space-y-6">
           <div className="space-y-2 text-left">
             <div className="flex items-center gap-2 mb-6">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg text-primary-foreground bg-orange-600">
                 <User size={16} />
               </div>
               <h1 className="text-xl font-semibold tracking-tight">Bazar Buddy</h1>
