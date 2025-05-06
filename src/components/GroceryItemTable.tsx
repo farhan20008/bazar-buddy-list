@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import { useGrocery, GroceryItem } from "@/contexts/GroceryContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -39,6 +40,7 @@ interface GroceryItemTableProps {
 
 export function GroceryItemTable({ listId, items, onDelete, isCreatePage = false }: GroceryItemTableProps) {
   const { removeItemFromList } = useGrocery();
+  const { language, isEnglish } = useLanguage();
   const [editItem, setEditItem] = useState<GroceryItem | null>(null);
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
 
@@ -65,9 +67,9 @@ export function GroceryItemTable({ listId, items, onDelete, isCreatePage = false
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Item</TableHead>
-            <TableHead className="text-center">Quantity</TableHead>
-            <TableHead className="text-right">Est. Price</TableHead>
+            <TableHead>{isEnglish ? "Item" : "আইটেম"}</TableHead>
+            <TableHead className="text-center">{isEnglish ? "Quantity" : "পরিমাণ"}</TableHead>
+            <TableHead className="text-right">{isEnglish ? "Est. Price" : "অনু. মূল্য"}</TableHead>
             <TableHead className="w-[50px]"></TableHead>
           </TableRow>
         </TableHeader>
@@ -75,7 +77,7 @@ export function GroceryItemTable({ listId, items, onDelete, isCreatePage = false
           {items.length === 0 ? (
             <TableRow>
               <TableCell colSpan={4} className="h-24 text-center">
-                No items added to this list yet.
+                {isEnglish ? "No items added to this list yet." : "এই তালিকায় এখনও কোন আইটেম যোগ করা হয়নি।"}
               </TableCell>
             </TableRow>
           ) : (
@@ -93,15 +95,15 @@ export function GroceryItemTable({ listId, items, onDelete, isCreatePage = false
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="icon">
                         <MoreHorizontal className="h-4 w-4" />
-                        <span className="sr-only">Open menu</span>
+                        <span className="sr-only">{isEnglish ? "Open menu" : "মেনু খুলুন"}</span>
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem onClick={() => handleEdit(item)}>
-                        <Edit className="mr-2 h-4 w-4" /> Edit
+                        <Edit className="mr-2 h-4 w-4" /> {isEnglish ? "Edit" : "সম্পাদনা"}
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => setItemToDelete(item.id)}>
-                        <Trash className="mr-2 h-4 w-4" /> Delete
+                        <Trash className="mr-2 h-4 w-4" /> {isEnglish ? "Delete" : "মুছুন"}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -116,7 +118,7 @@ export function GroceryItemTable({ listId, items, onDelete, isCreatePage = false
       <Dialog open={!!editItem} onOpenChange={(open) => !open && setEditItem(null)}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Edit Item</DialogTitle>
+            <DialogTitle>{isEnglish ? "Edit Item" : "আইটেম সম্পাদনা করুন"}</DialogTitle>
           </DialogHeader>
           {editItem && (
             <GroceryItemForm
@@ -133,15 +135,17 @@ export function GroceryItemTable({ listId, items, onDelete, isCreatePage = false
       <AlertDialog open={!!itemToDelete} onOpenChange={(open) => !open && setItemToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle>{isEnglish ? "Are you sure?" : "আপনি কি নিশ্চিত?"}</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the item from your grocery list.
+              {isEnglish 
+                ? "This action cannot be undone. This will permanently delete the item from your grocery list."
+                : "এই কাজটি পূর্বাবস্থায় ফেরানো যাবে না। এটি আপনার মুদি তালিকা থেকে আইটেমটি স্থায়ীভাবে মুছে ফেলবে।"}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{isEnglish ? "Cancel" : "বাতিল"}</AlertDialogCancel>
             <AlertDialogAction onClick={() => itemToDelete && handleDelete(itemToDelete)}>
-              Delete
+              {isEnglish ? "Delete" : "মুছুন"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

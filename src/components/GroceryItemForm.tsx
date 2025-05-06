@@ -1,6 +1,7 @@
 
 import { useEffect, useState } from "react";
 import { useGrocery, GroceryItem } from "@/contexts/GroceryContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,6 +18,7 @@ interface GroceryItemFormProps {
 }
 
 const UNITS = ["kg", "g", "lb", "pcs", "l", "ml", "dozen"];
+const UNITS_BN = ["কেজি", "গ্রাম", "পাউন্ড", "পিস", "লিটার", "মিলিলিটার", "ডজন"];
 
 export function GroceryItemForm({
   listId,
@@ -24,6 +26,7 @@ export function GroceryItemForm({
   onSubmit,
   isCreatePage = false
 }: GroceryItemFormProps) {
+  const { language, isEnglish } = useLanguage();
   const {
     addItemToList,
     updateItemInList,
@@ -49,8 +52,8 @@ export function GroceryItemForm({
     e.preventDefault();
     if (!name) {
       toast({
-        title: "Missing Information",
-        description: "Please provide an item name.",
+        title: isEnglish ? "Missing Information" : "তথ্য অনুপস্থিত",
+        description: isEnglish ? "Please provide an item name." : "অনুগ্রহ করে আইটেমের নাম প্রদান করুন।",
         variant: "destructive"
       });
       return;
@@ -112,8 +115,8 @@ export function GroceryItemForm({
   const handleGeneratePrice = async () => {
     if (!name || !quantity) {
       toast({
-        title: "Missing Information",
-        description: "Please provide a name and quantity for the item.",
+        title: isEnglish ? "Missing Information" : "তথ্য অনুপস্থিত",
+        description: isEnglish ? "Please provide a name and quantity for the item." : "অনুগ্রহ করে আইটেমের নাম এবং পরিমাণ প্রদান করুন।",
         variant: "destructive"
       });
       return;
@@ -124,13 +127,15 @@ export function GroceryItemForm({
       const price = await generatePriceSuggestion(name, parseFloat(quantity) || 1, unit);
       setEstimatedPrice(price.toString());
       toast({
-        title: "Price Generated",
-        description: `Estimated price for ${name}: $${price.toFixed(2)}`
+        title: isEnglish ? "Price Generated" : "মূল্য তৈরি হয়েছে",
+        description: isEnglish ? 
+          `Estimated price for ${name}: $${price.toFixed(2)}` : 
+          `${name} এর অনুমানিত মূল্য: $${price.toFixed(2)}`
       });
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to generate price suggestion.",
+        title: isEnglish ? "Error" : "ত্রুটি",
+        description: isEnglish ? "Failed to generate price suggestion." : "মূল্য প্রস্তাব তৈরি করতে ব্যর্থ।",
         variant: "destructive"
       });
     } finally {
@@ -140,23 +145,23 @@ export function GroceryItemForm({
   
   return <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-1.5">
-        <Label htmlFor="name">Item Name</Label>
-        <Input id="name" placeholder="e.g., Rice, Chicken, Eggs" value={name} onChange={e => setName(e.target.value)} />
+        <Label htmlFor="name">{isEnglish ? "Item Name" : "আইটেমের নাম"}</Label>
+        <Input id="name" placeholder={isEnglish ? "e.g., Rice, Chicken, Eggs" : "যেমন, চাল, মুরগি, ডিম"} value={name} onChange={e => setName(e.target.value)} />
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <Label htmlFor="quantity">Quantity</Label>
+          <Label htmlFor="quantity">{isEnglish ? "Quantity" : "পরিমাণ"}</Label>
           <Input id="quantity" type="text" inputMode="decimal" placeholder="1" value={quantity} onChange={e => handleQuantityChange(e.target.value)} />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="unit">Unit</Label>
+          <Label htmlFor="unit">{isEnglish ? "Unit" : "একক"}</Label>
           <Select value={unit} onValueChange={setUnit}>
             <SelectTrigger id="unit">
-              <SelectValue placeholder="Select unit" />
+              <SelectValue placeholder={isEnglish ? "Select unit" : "একক নির্বাচন করুন"} />
             </SelectTrigger>
             <SelectContent position="popper">
-              {UNITS.map(u => <SelectItem key={u} value={u}>
-                  {u}
+              {UNITS.map((u, index) => <SelectItem key={u} value={u}>
+                  {isEnglish ? u : UNITS_BN[index]}
                 </SelectItem>)}
             </SelectContent>
           </Select>
@@ -164,7 +169,7 @@ export function GroceryItemForm({
       </div>
       <div className="space-y-1.5">
         <div className="flex items-center justify-between">
-          <Label htmlFor="price">Estimated Price</Label>
+          <Label htmlFor="price">{isEnglish ? "Estimated Price" : "অনুমানিত মূল্য"}</Label>
           <Button 
             type="button" 
             size="sm" 
@@ -176,7 +181,7 @@ export function GroceryItemForm({
               <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : 
               <Sparkles className="mr-1.5 h-3.5 w-3.5" />
             }
-            Generate
+            {isEnglish ? "Generate" : "তৈরি করুন"}
           </Button>
         </div>
         <Input 
@@ -200,10 +205,11 @@ export function GroceryItemForm({
         {isLoading || localLoading ? (
           <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
         ) : item ? (
-          "Update Item"
+          isEnglish ? "Update Item" : "আইটেম আপডেট করুন"
         ) : (
           <>
-            <Plus className="mr-1.5 h-4 w-4" /> Add Item
+            <Plus className="mr-1.5 h-4 w-4" /> 
+            {isEnglish ? "Add Item" : "আইটেম যোগ করুন"}
           </>
         )}
       </Button>
