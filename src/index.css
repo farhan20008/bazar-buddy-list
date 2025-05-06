@@ -104,3 +104,34 @@
 .card-gradient > * {
   @apply relative z-10;
 }
+
+/* Animation classes for sidebar */
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+.sidebar-animate-in {
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+}
+
+.sidebar-visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { transform: translateX(-10px); }
+  to { transform: translateX(0); }
+}

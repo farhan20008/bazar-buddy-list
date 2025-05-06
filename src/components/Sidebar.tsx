@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -35,6 +36,23 @@ export function Sidebar({ className }: SidebarProps) {
   const userInitial = userName.charAt(0).toUpperCase();
   const userEmail = user?.email || "example@bazarbuddy.com";
 
+  // Animation helper for initial load
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      document.querySelectorAll('.sidebar-animate-in').forEach((el, i) => {
+        (el as HTMLElement).style.transitionDelay = `${i * 50}ms`;
+        el.classList.add('sidebar-visible');
+      });
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Toggle sidebar with animation
+  const toggleSidebar = () => {
+    setCollapsed(prev => !prev);
+  };
+
   const onLogout = () => {
     logout();
     navigate("/login");
@@ -48,17 +66,17 @@ export function Sidebar({ className }: SidebarProps) {
     {
       name: getText("dashboard", language),
       href: "/dashboard",
-      icon: <LayoutDashboard size={collapsed ? 20 : 18} />
+      icon: <LayoutDashboard size={collapsed ? 20 : 18} className="transition-all" />
     }, 
     {
       name: getText("createList", language),
       href: "/create-list",
-      icon: <PlusCircle size={collapsed ? 20 : 18} />
+      icon: <PlusCircle size={collapsed ? 20 : 18} className="transition-all" />
     }, 
     {
       name: getText("history", language),
       href: "/list-history",
-      icon: <ListMusic size={collapsed ? 20 : 18} />
+      icon: <ListMusic size={collapsed ? 20 : 18} className="transition-all" />
     }
   ];
 
@@ -82,16 +100,19 @@ export function Sidebar({ className }: SidebarProps) {
 
   const SidebarContent = () => (
     <div className={cn(
-      "flex h-screen flex-col border-r border-sidebar-border bg-sidebar transition-all duration-300",
+      "flex h-screen flex-col border-r border-sidebar-border bg-sidebar transition-all duration-300 ease-in-out",
       collapsed ? "w-16" : "w-64"
     )}>
       {/* Header/Logo section */}
-      <div className={cn("flex items-center gap-2 p-3", collapsed ? "justify-center" : "px-4")}>
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 text-primary-foreground">
+      <div className={cn(
+        "flex items-center gap-2 p-3 transition-all duration-300 ease-in-out sidebar-animate-in", 
+        collapsed ? "justify-center" : "px-4"
+      )}>
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 text-primary-foreground transition-transform hover:scale-105">
           <User size={16} />
         </div>
         {!collapsed && (
-          <div className="flex flex-col">
+          <div className="flex flex-col opacity-0 sidebar-animate-in sidebar-visible">
             <span className="text-lg font-semibold tracking-tight text-sidebar-foreground">BazarBuddy</span>
             <span className="text-xs text-sidebar-foreground/60">Family Grocery</span>
           </div>
@@ -104,16 +125,19 @@ export function Sidebar({ className }: SidebarProps) {
       <Button 
         variant="ghost" 
         size="sm" 
-        onClick={() => setCollapsed(!collapsed)} 
-        className="mx-auto mb-2 h-6 w-6 rounded-full p-0"
+        onClick={toggleSidebar} 
+        className="mx-auto mb-2 h-6 w-6 rounded-full p-0 hover:bg-sidebar-accent transition-all duration-200 ease-in-out hover:scale-110"
       >
-        {collapsed ? <ChevronsRight size={16} /> : <ChevronsLeft size={16} />}
+        {collapsed ? 
+          <ChevronsRight size={16} className="transition-transform duration-200" /> : 
+          <ChevronsLeft size={16} className="transition-transform duration-200" />
+        }
       </Button>
 
       {/* Main navigation */}
-      <div className="flex-1 px-2 py-1">
+      <div className="flex-1 px-2 py-1 overflow-y-auto scrollbar-none">
         <div className="mb-3">
-          {!collapsed && <p className="px-2 py-1 text-xs font-medium uppercase text-sidebar-foreground/50">Platform</p>}
+          {!collapsed && <p className="px-2 py-1 text-xs font-medium uppercase text-sidebar-foreground/50 opacity-0 sidebar-animate-in sidebar-visible">Platform</p>}
           <Collapsible
             open={playgroundOpen}
             onOpenChange={setPlaygroundOpen}
@@ -121,28 +145,33 @@ export function Sidebar({ className }: SidebarProps) {
           >
             <CollapsibleTrigger asChild>
               <button className={cn(
-                "flex w-full items-center gap-2 rounded-md px-2 py-2 text-sm text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                "flex w-full items-center gap-2 rounded-md px-2 py-2 text-sm text-sidebar-foreground transition-all duration-200",
+                "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:translate-x-1 opacity-0 sidebar-animate-in sidebar-visible",
                 location.pathname === "/playground" && "bg-sidebar-accent text-sidebar-accent-foreground"
               )}>
                 {collapsed ? (
                   <Beaker className="mx-auto" size={20} />
                 ) : (
                   <>
-                    <Beaker size={18} />
+                    <Beaker size={18} className="flex-shrink-0" />
                     <span className="flex-1 text-left">Playground</span>
-                    {playgroundOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                    {playgroundOpen ? 
+                      <ChevronDown size={16} className="transition-transform duration-200" /> : 
+                      <ChevronRight size={16} className="transition-transform duration-200" />
+                    }
                   </>
                 )}
               </button>
             </CollapsibleTrigger>
             {!collapsed && (
-              <CollapsibleContent className="pl-9">
+              <CollapsibleContent className="pl-9 overflow-hidden transition-all duration-300 ease-in-out">
                 <ul className="space-y-1 pb-1">
-                  {["History", "Starred", "Settings"].map((item) => (
+                  {["History", "Starred", "Settings"].map((item, index) => (
                     <li key={item}>
                       <a 
                         href="#"
-                        className="block rounded-md px-2 py-1 text-sm text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                        className="block rounded-md px-2 py-1 text-sm text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all duration-200 hover:translate-x-1"
+                        style={{ animationDelay: `${index * 50}ms` }}
                       >
                         {item}
                       </a>
@@ -155,7 +184,7 @@ export function Sidebar({ className }: SidebarProps) {
         </div>
 
         <nav className="flex flex-col gap-1">
-          {sidebarLinks.map(link => (
+          {sidebarLinks.map((link, index) => (
             <a 
               key={link.href} 
               href={link.href} 
@@ -165,10 +194,12 @@ export function Sidebar({ className }: SidebarProps) {
                 setOpen(false);
               }} 
               className={cn(
-                "flex items-center gap-3 rounded-md px-2 py-2 text-sm text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                "flex items-center gap-3 rounded-md px-2 py-2 text-sm text-sidebar-foreground transition-all duration-200",
+                "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:translate-x-1 opacity-0 sidebar-animate-in",
                 location.pathname === link.href && "bg-sidebar-accent text-sidebar-accent-foreground",
                 collapsed && "justify-center"
               )}
+              style={{ animationDelay: `${(index + 1) * 50}ms` }}
             >
               {link.icon}
               {!collapsed && <span>{link.name}</span>}
@@ -178,37 +209,37 @@ export function Sidebar({ className }: SidebarProps) {
           {/* Extra menu items shown in collapsed state */}
           {collapsed ? (
             <>
-              <a href="#" className="flex justify-center rounded-md px-2 py-2 text-sm transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
-                <Database size={20} />
+              <a href="#" className="flex justify-center rounded-md px-2 py-2 text-sm transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground opacity-0 sidebar-animate-in sidebar-visible" style={{ animationDelay: '250ms' }}>
+                <Database size={20} className="transition-transform hover:scale-110" />
               </a>
-              <a href="#" className="flex justify-center rounded-md px-2 py-2 text-sm transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
-                <BookText size={20} />
+              <a href="#" className="flex justify-center rounded-md px-2 py-2 text-sm transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground opacity-0 sidebar-animate-in sidebar-visible" style={{ animationDelay: '300ms' }}>
+                <BookText size={20} className="transition-transform hover:scale-110" />
               </a>
-              <a href="#" className="flex justify-center rounded-md px-2 py-2 text-sm transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
-                <Settings size={20} />
+              <a href="#" className="flex justify-center rounded-md px-2 py-2 text-sm transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground opacity-0 sidebar-animate-in sidebar-visible" style={{ animationDelay: '350ms' }}>
+                <Settings size={20} className="transition-transform hover:scale-110" />
               </a>
             </>
           ) : (
             <>
               <div className="my-1">
-                <a href="#" className="flex items-center gap-3 rounded-md px-2 py-2 text-sm text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
-                  <Database size={18} />
+                <a href="#" className="flex items-center gap-3 rounded-md px-2 py-2 text-sm text-sidebar-foreground transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:translate-x-1 opacity-0 sidebar-animate-in sidebar-visible" style={{ animationDelay: '250ms' }}>
+                  <Database size={18} className="flex-shrink-0" />
                   <span>Models</span>
-                  <ChevronRight size={16} className="ml-auto" />
+                  <ChevronRight size={16} className="ml-auto transition-transform group-hover:translate-x-1" />
                 </a>
               </div>
               <div className="my-1">
-                <a href="#" className="flex items-center gap-3 rounded-md px-2 py-2 text-sm text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
-                  <BookText size={18} />
+                <a href="#" className="flex items-center gap-3 rounded-md px-2 py-2 text-sm text-sidebar-foreground transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:translate-x-1 opacity-0 sidebar-animate-in sidebar-visible" style={{ animationDelay: '300ms' }}>
+                  <BookText size={18} className="flex-shrink-0" />
                   <span>Documentation</span>
-                  <ChevronRight size={16} className="ml-auto" />
+                  <ChevronRight size={16} className="ml-auto transition-transform group-hover:translate-x-1" />
                 </a>
               </div>
               <div className="my-1">
-                <a href="#" className="flex items-center gap-3 rounded-md px-2 py-2 text-sm text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
-                  <Settings size={18} />
+                <a href="#" className="flex items-center gap-3 rounded-md px-2 py-2 text-sm text-sidebar-foreground transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:translate-x-1 opacity-0 sidebar-animate-in sidebar-visible" style={{ animationDelay: '350ms' }}>
+                  <Settings size={18} className="flex-shrink-0" />
                   <span>Settings</span>
-                  <ChevronRight size={16} className="ml-auto" />
+                  <ChevronRight size={16} className="ml-auto transition-transform group-hover:translate-x-1" />
                 </a>
               </div>
             </>
@@ -217,15 +248,15 @@ export function Sidebar({ className }: SidebarProps) {
       </div>
 
       {/* User profile section */}
-      <div className="sticky bottom-0 border-t border-sidebar-border bg-sidebar p-2">
+      <div className="sticky bottom-0 border-t border-sidebar-border bg-sidebar p-2 transition-all duration-300">
         <Popover>
           <PopoverTrigger asChild>
             <div className={cn(
-              "flex cursor-pointer items-center gap-3 rounded-md px-2 py-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+              "flex cursor-pointer items-center gap-3 rounded-md px-2 py-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all duration-200",
               collapsed ? "justify-center" : "justify-between"
             )}>
               <div className="flex items-center gap-2">
-                <Avatar className="h-8 w-8">
+                <Avatar className="h-8 w-8 transition-transform hover:scale-110">
                   <AvatarFallback className="bg-primary/10 text-sidebar-foreground">
                     {userInitial}
                   </AvatarFallback>
@@ -241,13 +272,13 @@ export function Sidebar({ className }: SidebarProps) {
                   </div>
                 )}
               </div>
-              {!collapsed && <ChevronRight size={16} />}
+              {!collapsed && <ChevronRight size={16} className="transition-transform duration-200 group-hover:translate-x-1" />}
             </div>
           </PopoverTrigger>
-          <PopoverContent className="w-56 p-0" side="right" align="start">
+          <PopoverContent className="w-56 p-0 animate-in fade-in-50 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95" side="right" align="start">
             <div className="border-b border-sidebar-border p-2">
               <div className="flex items-center gap-2 pb-2">
-                <Avatar className="h-9 w-9">
+                <Avatar className="h-9 w-9 transition-transform hover:scale-110">
                   <AvatarFallback className="bg-primary/10">{userInitial}</AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col">
@@ -255,13 +286,18 @@ export function Sidebar({ className }: SidebarProps) {
                   <span className="text-xs text-muted-foreground">{userEmail}</span>
                 </div>
               </div>
-              <Button variant="outline" size="sm" className="w-full mt-1">
+              <Button variant="outline" size="sm" className="w-full mt-1 transition-all hover:bg-primary/10 hover:text-primary">
                 Upgrade to Pro
               </Button>
             </div>
             <div className="p-1">
-              {userMenuLinks.map((item) => (
-                <Button key={item.name} variant="ghost" size="sm" className="w-full justify-start text-sm mb-1">
+              {userMenuLinks.map((item, i) => (
+                <Button 
+                  key={item.name} 
+                  variant="ghost" 
+                  size="sm" 
+                  className="w-full justify-start text-sm mb-1 transition-all duration-200 hover:translate-x-1"
+                >
                   {item.icon}
                   <span className="ml-2">{item.name}</span>
                 </Button>
@@ -270,7 +306,7 @@ export function Sidebar({ className }: SidebarProps) {
                 variant="ghost" 
                 size="sm" 
                 onClick={onLogout}
-                className="w-full justify-start text-sm text-destructive hover:text-destructive hover:bg-destructive/10"
+                className="w-full justify-start text-sm text-destructive hover:text-destructive hover:bg-destructive/10 transition-all duration-200 hover:translate-x-1"
               >
                 <LogOut size={16} />
                 <span className="ml-2">{getText("logout", language)}</span>
@@ -308,7 +344,7 @@ export function Sidebar({ className }: SidebarProps) {
               </span>
             </div>
           </div>
-          <SheetContent side="left" className="p-0">
+          <SheetContent side="left" className="p-0 w-[280px] sm:max-w-none">
             <SidebarContent />
           </SheetContent>
         </Sheet>
