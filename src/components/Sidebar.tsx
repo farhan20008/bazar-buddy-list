@@ -116,7 +116,7 @@ export function Sidebar({ className }: SidebarProps) {
     }
   ];
 
-  const SidebarContent = () => (
+  const SidebarContentComponent = () => (
     <ShadcnSidebar
       className={cn(
         "h-screen transition-all duration-300 ease-in-out",
@@ -157,7 +157,7 @@ export function Sidebar({ className }: SidebarProps) {
       <SidebarContent className="px-2 py-1">
         <SidebarGroup>
           {!collapsed && 
-            <SidebarGroupLabel className="opacity-0 sidebar-animate-in sidebar-visible">
+            <SidebarGroupLabel>
               Platform
             </SidebarGroupLabel>
           }
@@ -404,7 +404,7 @@ export function Sidebar({ className }: SidebarProps) {
   return (
     <SidebarProvider defaultOpen={!collapsed}>
       <div className={cn("hidden md:block", className)}>
-        <SidebarContent />
+        <SidebarContentComponent />
       </div>
       <div className="md:hidden">
         <Sheet open={open} onOpenChange={setOpen}>
@@ -427,7 +427,7 @@ export function Sidebar({ className }: SidebarProps) {
             </div>
           </div>
           <SheetContent side="left" className="p-0 w-[280px] sm:max-w-none">
-            <SidebarContent />
+            <SidebarContentComponent />
           </SheetContent>
         </Sheet>
       </div>
