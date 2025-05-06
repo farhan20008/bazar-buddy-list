@@ -1,75 +1,41 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { cn } from "@/lib/utils";
-import { 
-  ChevronDown, ChevronRight, LogOut, User, 
-  LayoutDashboard, Beaker, History, Settings, Database, BookText, 
-  CreditCard, Bell, PlusCircle, ListMusic, ChevronsLeft, ChevronsRight
-} from "lucide-react";
-
-import {
-  SidebarProvider,
-  Sidebar as ShadcnSidebar,
-  SidebarTrigger,
-  SidebarContent,
-  SidebarHeader,
-  SidebarFooter,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarGroupContent,
-} from "@/components/ui/sidebar";
-
-import { Button } from "./ui/button";
-import { Separator } from "./ui/separator";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import { toast } from "@/components/ui/use-toast";
+import { LayoutDashboard, ListMusic, LogOut, Menu, PlusCircle, User, X } from "lucide-react";
 import { getText } from "@/utils/translations";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
+import { toast } from "@/components/ui/use-toast";
+import {
+  Sidebar as ShadcnSidebar, 
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  useSidebar
+} from "@/components/ui/sidebar";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 interface SidebarProps {
   className?: string;
 }
 
 export function Sidebar({ className }: SidebarProps) {
-  const [collapsed, setCollapsed] = useState(false);
   const [open, setOpen] = useState(false);
-  const [playgroundOpen, setPlaygroundOpen] = useState(true);
   const { user, logout } = useAuth();
   const { language } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
-  const isMobile = useIsMobile();
   
   // Get user's name from metadata or use email as fallback
   const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || "User";
   const userInitial = userName.charAt(0).toUpperCase();
-  const userEmail = user?.email || "example@bazarbuddy.com";
-
-  // Animation helper for initial load
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      document.querySelectorAll('.sidebar-animate-in').forEach((el, i) => {
-        (el as HTMLElement).style.transitionDelay = `${i * 50}ms`;
-        el.classList.add('sidebar-visible');
-      });
-    }, 100);
-    
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Toggle sidebar with animation
-  const toggleSidebar = () => {
-    setCollapsed(prev => !prev);
-  };
 
   const onLogout = () => {
     logout();
@@ -84,350 +50,133 @@ export function Sidebar({ className }: SidebarProps) {
     {
       name: getText("dashboard", language),
       href: "/dashboard",
-      icon: <LayoutDashboard size={collapsed ? 20 : 18} className="transition-all" />
+      icon: <LayoutDashboard size={18} />
     }, 
     {
       name: getText("createList", language),
       href: "/create-list",
-      icon: <PlusCircle size={collapsed ? 20 : 18} className="transition-all" />
+      icon: <PlusCircle size={18} />
     }, 
     {
       name: getText("history", language),
       href: "/list-history",
-      icon: <ListMusic size={collapsed ? 20 : 18} className="transition-all" />
+      icon: <ListMusic size={18} />
     }
   ];
 
-  const userMenuLinks = [
-    {
-      name: "Account",
-      href: "#",
-      icon: <User size={16} />
-    },
-    {
-      name: "Billing",
-      href: "#",
-      icon: <CreditCard size={16} />
-    },
-    {
-      name: "Notifications",
-      href: "#", 
-      icon: <Bell size={16} />
-    }
-  ];
-
-  const SidebarContentComponent = () => (
-    <ShadcnSidebar
-      className={cn(
-        "h-screen transition-all duration-300 ease-in-out",
-      )}
-    >
-      {/* Header/Logo section */}
-      <SidebarHeader className={cn(
-        "flex items-center gap-2 p-3 transition-all duration-300 ease-in-out", 
-        collapsed ? "justify-center" : "px-4"
-      )}>
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 text-primary-foreground transition-transform hover:scale-105 sidebar-animate-in">
-          <User size={16} />
-        </div>
-        {!collapsed && (
-          <div className="flex flex-col opacity-0 sidebar-animate-in sidebar-visible">
-            <span className="text-lg font-semibold tracking-tight text-sidebar-foreground">BazarBuddy</span>
-            <span className="text-xs text-sidebar-foreground/60">Family Grocery</span>
-          </div>
-        )}
-      </SidebarHeader>
-      
-      <Separator className="my-2" />
-
-      {/* Sidebar collapse button */}
-      <Button 
-        variant="ghost" 
-        size="sm" 
-        onClick={toggleSidebar} 
-        className="mx-auto mb-2 h-6 w-6 rounded-full p-0 hover:bg-sidebar-accent transition-all duration-200 ease-in-out hover:scale-110"
-      >
-        {collapsed ? 
-          <ChevronsRight size={16} className="transition-transform duration-200" /> : 
-          <ChevronsLeft size={16} className="transition-transform duration-200" />
-        }
-      </Button>
-
-      {/* Main navigation */}
-      <SidebarContent className="px-2 py-1">
-        <SidebarGroup>
-          {!collapsed && 
-            <SidebarGroupLabel>
-              Platform
-            </SidebarGroupLabel>
-          }
-          <SidebarGroupContent>
-            <Collapsible
-              open={playgroundOpen}
-              onOpenChange={setPlaygroundOpen}
-              className="w-full"
-            >
-              <CollapsibleTrigger asChild>
-                <button className={cn(
-                  "flex w-full items-center gap-2 rounded-md px-2 py-2 text-sm text-sidebar-foreground transition-all duration-200",
-                  "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:translate-x-1 opacity-0 sidebar-animate-in sidebar-visible",
-                  location.pathname === "/playground" && "bg-sidebar-accent text-sidebar-accent-foreground"
-                )}>
-                  {collapsed ? (
-                    <Beaker className="mx-auto" size={20} />
-                  ) : (
-                    <>
-                      <Beaker size={18} className="flex-shrink-0" />
-                      <span className="flex-1 text-left">Playground</span>
-                      {playgroundOpen ? 
-                        <ChevronDown size={16} className="transition-transform duration-200" /> : 
-                        <ChevronRight size={16} className="transition-transform duration-200" />
-                      }
-                    </>
-                  )}
-                </button>
-              </CollapsibleTrigger>
-              {!collapsed && (
-                <CollapsibleContent className="pl-9 overflow-hidden transition-all duration-300 ease-in-out">
-                  <ul className="space-y-1 pb-1">
-                    {["History", "Starred", "Settings"].map((item, index) => (
-                      <li key={item}>
-                        <a 
-                          href="#"
-                          className="block rounded-md px-2 py-1 text-sm text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all duration-200 hover:translate-x-1 opacity-0 sidebar-animate-in sidebar-visible"
-                          style={{ animationDelay: `${index * 50}ms` }}
-                        >
-                          {item}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </CollapsibleContent>
+  // Create the sidebar content component - using CustomSidebarContent name to avoid conflicts
+  const CustomSidebarContent = () => {
+    const { state } = useSidebar();
+    
+    return (
+      <ShadcnSidebar>
+        <SidebarHeader>
+          <div className="flex items-center gap-2 px-2 py-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg text-primary-foreground bg-orange-600">
+              <User size={16} />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-lg font-semibold tracking-tight text-sidebar-foreground">
+                BazarBuddy
+              </span>
+              {state !== "collapsed" && (
+                <span className="text-xs text-sidebar-foreground/60">
+                  Family Grocery management
+                </span>
               )}
-            </Collapsible>
-          </SidebarGroupContent>
-        </SidebarGroup>
+            </div>
+          </div>
+          <Separator className="mb-2" />
+        </SidebarHeader>
         
-        <SidebarGroup>
+        <SidebarContent>
           <SidebarMenu>
-            {sidebarLinks.map((link, index) => (
+            {sidebarLinks.map(link => (
               <SidebarMenuItem key={link.href}>
-                <SidebarMenuButton
-                  asChild
+                <SidebarMenuButton 
+                  asChild 
+                  tooltip={link.name}
                   isActive={location.pathname === link.href}
-                  className={cn(
-                    "opacity-0 sidebar-animate-in",
-                    collapsed && "justify-center"
-                  )}
-                  tooltip={collapsed ? link.name : undefined}
-                  style={{ animationDelay: `${(index + 1) * 50}ms` }}
                 >
                   <a 
-                    href={link.href} 
-                    onClick={e => {
+                    href={link.href}
+                    onClick={(e) => {
                       e.preventDefault();
                       navigate(link.href);
                       setOpen(false);
                     }}
                   >
                     {link.icon}
-                    {!collapsed && <span>{link.name}</span>}
+                    <span>{link.name}</span>
                   </a>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             ))}
-
-            {/* Extra menu items */}
-            {collapsed ? (
-              <>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    className="opacity-0 sidebar-animate-in sidebar-visible justify-center"
-                    tooltip="Models"
-                    style={{ animationDelay: '250ms' }}
-                  >
-                    <a href="#">
-                      <Database size={20} className="transition-transform hover:scale-110" />
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    className="opacity-0 sidebar-animate-in sidebar-visible justify-center"
-                    tooltip="Documentation"
-                    style={{ animationDelay: '300ms' }}
-                  >
-                    <a href="#">
-                      <BookText size={20} className="transition-transform hover:scale-110" />
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    className="opacity-0 sidebar-animate-in sidebar-visible justify-center"
-                    tooltip="Settings"
-                    style={{ animationDelay: '350ms' }}
-                  >
-                    <a href="#">
-                      <Settings size={20} className="transition-transform hover:scale-110" />
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              </>
-            ) : (
-              <>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    className="opacity-0 sidebar-animate-in sidebar-visible"
-                    style={{ animationDelay: '250ms' }}
-                  >
-                    <a href="#" className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <Database size={18} className="flex-shrink-0" />
-                        <span>Models</span>
-                      </div>
-                      <ChevronRight size={16} className="transition-transform group-hover:translate-x-1" />
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    className="opacity-0 sidebar-animate-in sidebar-visible"
-                    style={{ animationDelay: '300ms' }}
-                  >
-                    <a href="#" className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <BookText size={18} className="flex-shrink-0" />
-                        <span>Documentation</span>
-                      </div>
-                      <ChevronRight size={16} className="transition-transform group-hover:translate-x-1" />
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    className="opacity-0 sidebar-animate-in sidebar-visible"
-                    style={{ animationDelay: '350ms' }}
-                  >
-                    <a href="#" className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <Settings size={18} className="flex-shrink-0" />
-                        <span>Settings</span>
-                      </div>
-                      <ChevronRight size={16} className="transition-transform group-hover:translate-x-1" />
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              </>
-            )}
           </SidebarMenu>
-        </SidebarGroup>
-      </SidebarContent>
-
-      {/* User profile section */}
-      <SidebarFooter className="sticky bottom-0 border-t border-sidebar-border bg-sidebar p-2">
-        <Popover>
-          <PopoverTrigger asChild>
-            <div className={cn(
-              "flex cursor-pointer items-center gap-3 rounded-md px-2 py-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all duration-200",
-              collapsed ? "justify-center" : "justify-between"
-            )}>
-              <div className="flex items-center gap-2">
-                <Avatar className="h-8 w-8 transition-transform hover:scale-110">
-                  <AvatarFallback className="bg-primary/10 text-sidebar-foreground">
-                    {userInitial}
-                  </AvatarFallback>
-                </Avatar>
-                {!collapsed && (
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium text-sidebar-foreground">
-                      {userName}
-                    </span>
-                    <span className="text-xs text-sidebar-foreground/60 truncate max-w-[120px]">
-                      {userEmail}
-                    </span>
-                  </div>
-                )}
+        </SidebarContent>
+        
+        <SidebarFooter>
+          <div className="flex items-center justify-between p-3">
+            <div className="flex items-center gap-3">
+              <Avatar className="h-9 w-9">
+                <AvatarFallback className="bg-primary/10 text-sidebar-foreground">
+                  {userInitial}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex flex-col">
+                <span className="text-sm font-medium text-sidebar-foreground">
+                  {userName}
+                </span>
+                <span className="text-xs text-sidebar-foreground/60">
+                  {user?.email || "user@example.com"}
+                </span>
               </div>
-              {!collapsed && <ChevronRight size={16} className="transition-transform duration-200 group-hover:translate-x-1" />}
             </div>
-          </PopoverTrigger>
-          <PopoverContent className="w-56 p-0 animate-in fade-in-50 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95" side="right" align="start">
-            <div className="border-b border-sidebar-border p-2">
-              <div className="flex items-center gap-2 pb-2">
-                <Avatar className="h-9 w-9 transition-transform hover:scale-110">
-                  <AvatarFallback className="bg-primary/10">{userInitial}</AvatarFallback>
-                </Avatar>
-                <div className="flex flex-col">
-                  <span className="font-medium">{userName}</span>
-                  <span className="text-xs text-muted-foreground">{userEmail}</span>
-                </div>
-              </div>
-              <Button variant="outline" size="sm" className="w-full mt-1 transition-all hover:bg-primary/10 hover:text-primary">
-                Upgrade to Pro
-              </Button>
-            </div>
-            <div className="p-1">
-              {userMenuLinks.map((item, i) => (
-                <Button 
-                  key={item.name} 
-                  variant="ghost" 
-                  size="sm" 
-                  className="w-full justify-start text-sm mb-1 transition-all duration-200 hover:translate-x-1"
-                >
-                  {item.icon}
-                  <span className="ml-2">{item.name}</span>
-                </Button>
-              ))}
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={onLogout}
-                className="w-full justify-start text-sm text-destructive hover:text-destructive hover:bg-destructive/10 transition-all duration-200 hover:translate-x-1"
-              >
-                <LogOut size={16} />
-                <span className="ml-2">{getText("logout", language)}</span>
-              </Button>
-            </div>
-          </PopoverContent>
-        </Popover>
-      </SidebarFooter>
-    </ShadcnSidebar>
-  );
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={onLogout} 
+              className="text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+              aria-label={getText("logout", language)}
+            >
+              <LogOut size={18} />
+            </Button>
+          </div>
+        </SidebarFooter>
+      </ShadcnSidebar>
+    );
+  };
 
+  // Mobile sidebar using Sheet component
   return (
-    <SidebarProvider defaultOpen={!collapsed}>
-      <div className={cn("hidden md:block", className)}>
-        <SidebarContentComponent />
+    <SidebarProvider>
+      <div className="hidden md:block h-screen">
+        <CustomSidebarContent />
       </div>
       <div className="md:hidden">
         <Sheet open={open} onOpenChange={setOpen}>
           <div className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b bg-background px-4">
             <SheetTrigger asChild>
               <Button variant="outline" size="icon" className="lg:hidden">
-                <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M1.5 3C1.22386 3 1 3.22386 1 3.5C1 3.77614 1.22386 4 1.5 4H13.5C13.7761 4 14 3.77614 14 3.5C14 3.22386 13.7761 3 13.5 3H1.5ZM1.5 7C1.22386 7 1 7.22386 1 7.5C1 7.77614 1.22386 8 1.5 8H13.5C13.7761 8 14 7.77614 14 7.5C14 7.22386 13.7761 7 13.5 7H1.5ZM1.5 11C1.22386 11 1 11.2239 1 11.5C1 11.7761 1.22386 12 1.5 12H13.5C13.7761 12 14 11.7761 14 11.5C14 11.2239 13.7761 11 13.5 11H1.5Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd"></path>
-                </svg>
+                <Menu className="h-5 w-5" />
                 <span className="sr-only">Toggle navigation menu</span>
               </Button>
             </SheetTrigger>
             <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center text-primary-foreground rounded-lg bg-blue-600">
+              <div className="flex h-8 w-8 items-center justify-center text-primary-foreground rounded-2xl bg-orange-600">
                 <User size={16} />
               </div>
               <span className="text-lg font-semibold tracking-tight">
-                Bazar Buddy
+                BazarBuddy
               </span>
             </div>
           </div>
-          <SheetContent side="left" className="p-0 w-[280px] sm:max-w-none">
-            <SidebarContentComponent />
+          <SheetContent side="left" className="p-0">
+            <Button variant="ghost" size="icon" className="absolute right-4 top-4 md:hidden" onClick={() => setOpen(false)}>
+              <X className="h-5 w-5" />
+              <span className="sr-only">Close sidebar</span>
+            </Button>
+            <CustomSidebarContent />
           </SheetContent>
         </Sheet>
       </div>
