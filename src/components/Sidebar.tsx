@@ -6,9 +6,25 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
 import { 
   ChevronDown, ChevronRight, LogOut, User, 
-  LayoutDashboard, Beaker, History, Star, Settings, Database, BookText, 
+  LayoutDashboard, Beaker, History, Settings, Database, BookText, 
   CreditCard, Bell, PlusCircle, ListMusic, ChevronsLeft, ChevronsRight
 } from "lucide-react";
+
+import {
+  SidebarProvider,
+  Sidebar as ShadcnSidebar,
+  SidebarTrigger,
+  SidebarContent,
+  SidebarHeader,
+  SidebarFooter,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarGroupContent,
+} from "@/components/ui/sidebar";
+
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
@@ -17,6 +33,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collap
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { toast } from "@/components/ui/use-toast";
 import { getText } from "@/utils/translations";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface SidebarProps {
   className?: string;
@@ -30,6 +47,7 @@ export function Sidebar({ className }: SidebarProps) {
   const { language } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
+  const isMobile = useIsMobile();
   
   // Get user's name from metadata or use email as fallback
   const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || "User";
@@ -99,16 +117,17 @@ export function Sidebar({ className }: SidebarProps) {
   ];
 
   const SidebarContent = () => (
-    <div className={cn(
-      "flex h-screen flex-col border-r border-sidebar-border bg-sidebar transition-all duration-300 ease-in-out",
-      collapsed ? "w-16" : "w-64"
-    )}>
+    <ShadcnSidebar
+      className={cn(
+        "h-screen transition-all duration-300 ease-in-out",
+      )}
+    >
       {/* Header/Logo section */}
-      <div className={cn(
-        "flex items-center gap-2 p-3 transition-all duration-300 ease-in-out sidebar-animate-in", 
+      <SidebarHeader className={cn(
+        "flex items-center gap-2 p-3 transition-all duration-300 ease-in-out", 
         collapsed ? "justify-center" : "px-4"
       )}>
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 text-primary-foreground transition-transform hover:scale-105">
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 text-primary-foreground transition-transform hover:scale-105 sidebar-animate-in">
           <User size={16} />
         </div>
         {!collapsed && (
@@ -117,7 +136,7 @@ export function Sidebar({ className }: SidebarProps) {
             <span className="text-xs text-sidebar-foreground/60">Family Grocery</span>
           </div>
         )}
-      </div>
+      </SidebarHeader>
       
       <Separator className="my-2" />
 
@@ -135,120 +154,184 @@ export function Sidebar({ className }: SidebarProps) {
       </Button>
 
       {/* Main navigation */}
-      <div className="flex-1 px-2 py-1 overflow-y-auto scrollbar-none">
-        <div className="mb-3">
-          {!collapsed && <p className="px-2 py-1 text-xs font-medium uppercase text-sidebar-foreground/50 opacity-0 sidebar-animate-in sidebar-visible">Platform</p>}
-          <Collapsible
-            open={playgroundOpen}
-            onOpenChange={setPlaygroundOpen}
-            className="w-full"
-          >
-            <CollapsibleTrigger asChild>
-              <button className={cn(
-                "flex w-full items-center gap-2 rounded-md px-2 py-2 text-sm text-sidebar-foreground transition-all duration-200",
-                "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:translate-x-1 opacity-0 sidebar-animate-in sidebar-visible",
-                location.pathname === "/playground" && "bg-sidebar-accent text-sidebar-accent-foreground"
-              )}>
-                {collapsed ? (
-                  <Beaker className="mx-auto" size={20} />
-                ) : (
-                  <>
-                    <Beaker size={18} className="flex-shrink-0" />
-                    <span className="flex-1 text-left">Playground</span>
-                    {playgroundOpen ? 
-                      <ChevronDown size={16} className="transition-transform duration-200" /> : 
-                      <ChevronRight size={16} className="transition-transform duration-200" />
-                    }
-                  </>
-                )}
-              </button>
-            </CollapsibleTrigger>
-            {!collapsed && (
-              <CollapsibleContent className="pl-9 overflow-hidden transition-all duration-300 ease-in-out">
-                <ul className="space-y-1 pb-1">
-                  {["History", "Starred", "Settings"].map((item, index) => (
-                    <li key={item}>
-                      <a 
-                        href="#"
-                        className="block rounded-md px-2 py-1 text-sm text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all duration-200 hover:translate-x-1"
-                        style={{ animationDelay: `${index * 50}ms` }}
-                      >
-                        {item}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </CollapsibleContent>
-            )}
-          </Collapsible>
-        </div>
-
-        <nav className="flex flex-col gap-1">
-          {sidebarLinks.map((link, index) => (
-            <a 
-              key={link.href} 
-              href={link.href} 
-              onClick={e => {
-                e.preventDefault();
-                navigate(link.href);
-                setOpen(false);
-              }} 
-              className={cn(
-                "flex items-center gap-3 rounded-md px-2 py-2 text-sm text-sidebar-foreground transition-all duration-200",
-                "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:translate-x-1 opacity-0 sidebar-animate-in",
-                location.pathname === link.href && "bg-sidebar-accent text-sidebar-accent-foreground",
-                collapsed && "justify-center"
-              )}
-              style={{ animationDelay: `${(index + 1) * 50}ms` }}
+      <SidebarContent className="px-2 py-1">
+        <SidebarGroup>
+          {!collapsed && 
+            <SidebarGroupLabel className="opacity-0 sidebar-animate-in sidebar-visible">
+              Platform
+            </SidebarGroupLabel>
+          }
+          <SidebarGroupContent>
+            <Collapsible
+              open={playgroundOpen}
+              onOpenChange={setPlaygroundOpen}
+              className="w-full"
             >
-              {link.icon}
-              {!collapsed && <span>{link.name}</span>}
-            </a>
-          ))}
+              <CollapsibleTrigger asChild>
+                <button className={cn(
+                  "flex w-full items-center gap-2 rounded-md px-2 py-2 text-sm text-sidebar-foreground transition-all duration-200",
+                  "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:translate-x-1 opacity-0 sidebar-animate-in sidebar-visible",
+                  location.pathname === "/playground" && "bg-sidebar-accent text-sidebar-accent-foreground"
+                )}>
+                  {collapsed ? (
+                    <Beaker className="mx-auto" size={20} />
+                  ) : (
+                    <>
+                      <Beaker size={18} className="flex-shrink-0" />
+                      <span className="flex-1 text-left">Playground</span>
+                      {playgroundOpen ? 
+                        <ChevronDown size={16} className="transition-transform duration-200" /> : 
+                        <ChevronRight size={16} className="transition-transform duration-200" />
+                      }
+                    </>
+                  )}
+                </button>
+              </CollapsibleTrigger>
+              {!collapsed && (
+                <CollapsibleContent className="pl-9 overflow-hidden transition-all duration-300 ease-in-out">
+                  <ul className="space-y-1 pb-1">
+                    {["History", "Starred", "Settings"].map((item, index) => (
+                      <li key={item}>
+                        <a 
+                          href="#"
+                          className="block rounded-md px-2 py-1 text-sm text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all duration-200 hover:translate-x-1 opacity-0 sidebar-animate-in sidebar-visible"
+                          style={{ animationDelay: `${index * 50}ms` }}
+                        >
+                          {item}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </CollapsibleContent>
+              )}
+            </Collapsible>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        
+        <SidebarGroup>
+          <SidebarMenu>
+            {sidebarLinks.map((link, index) => (
+              <SidebarMenuItem key={link.href}>
+                <SidebarMenuButton
+                  asChild
+                  isActive={location.pathname === link.href}
+                  className={cn(
+                    "opacity-0 sidebar-animate-in",
+                    collapsed && "justify-center"
+                  )}
+                  tooltip={collapsed ? link.name : undefined}
+                  style={{ animationDelay: `${(index + 1) * 50}ms` }}
+                >
+                  <a 
+                    href={link.href} 
+                    onClick={e => {
+                      e.preventDefault();
+                      navigate(link.href);
+                      setOpen(false);
+                    }}
+                  >
+                    {link.icon}
+                    {!collapsed && <span>{link.name}</span>}
+                  </a>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
 
-          {/* Extra menu items shown in collapsed state */}
-          {collapsed ? (
-            <>
-              <a href="#" className="flex justify-center rounded-md px-2 py-2 text-sm transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground opacity-0 sidebar-animate-in sidebar-visible" style={{ animationDelay: '250ms' }}>
-                <Database size={20} className="transition-transform hover:scale-110" />
-              </a>
-              <a href="#" className="flex justify-center rounded-md px-2 py-2 text-sm transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground opacity-0 sidebar-animate-in sidebar-visible" style={{ animationDelay: '300ms' }}>
-                <BookText size={20} className="transition-transform hover:scale-110" />
-              </a>
-              <a href="#" className="flex justify-center rounded-md px-2 py-2 text-sm transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground opacity-0 sidebar-animate-in sidebar-visible" style={{ animationDelay: '350ms' }}>
-                <Settings size={20} className="transition-transform hover:scale-110" />
-              </a>
-            </>
-          ) : (
-            <>
-              <div className="my-1">
-                <a href="#" className="flex items-center gap-3 rounded-md px-2 py-2 text-sm text-sidebar-foreground transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:translate-x-1 opacity-0 sidebar-animate-in sidebar-visible" style={{ animationDelay: '250ms' }}>
-                  <Database size={18} className="flex-shrink-0" />
-                  <span>Models</span>
-                  <ChevronRight size={16} className="ml-auto transition-transform group-hover:translate-x-1" />
-                </a>
-              </div>
-              <div className="my-1">
-                <a href="#" className="flex items-center gap-3 rounded-md px-2 py-2 text-sm text-sidebar-foreground transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:translate-x-1 opacity-0 sidebar-animate-in sidebar-visible" style={{ animationDelay: '300ms' }}>
-                  <BookText size={18} className="flex-shrink-0" />
-                  <span>Documentation</span>
-                  <ChevronRight size={16} className="ml-auto transition-transform group-hover:translate-x-1" />
-                </a>
-              </div>
-              <div className="my-1">
-                <a href="#" className="flex items-center gap-3 rounded-md px-2 py-2 text-sm text-sidebar-foreground transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:translate-x-1 opacity-0 sidebar-animate-in sidebar-visible" style={{ animationDelay: '350ms' }}>
-                  <Settings size={18} className="flex-shrink-0" />
-                  <span>Settings</span>
-                  <ChevronRight size={16} className="ml-auto transition-transform group-hover:translate-x-1" />
-                </a>
-              </div>
-            </>
-          )}
-        </nav>
-      </div>
+            {/* Extra menu items */}
+            {collapsed ? (
+              <>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    className="opacity-0 sidebar-animate-in sidebar-visible justify-center"
+                    tooltip="Models"
+                    style={{ animationDelay: '250ms' }}
+                  >
+                    <a href="#">
+                      <Database size={20} className="transition-transform hover:scale-110" />
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    className="opacity-0 sidebar-animate-in sidebar-visible justify-center"
+                    tooltip="Documentation"
+                    style={{ animationDelay: '300ms' }}
+                  >
+                    <a href="#">
+                      <BookText size={20} className="transition-transform hover:scale-110" />
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    className="opacity-0 sidebar-animate-in sidebar-visible justify-center"
+                    tooltip="Settings"
+                    style={{ animationDelay: '350ms' }}
+                  >
+                    <a href="#">
+                      <Settings size={20} className="transition-transform hover:scale-110" />
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </>
+            ) : (
+              <>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    className="opacity-0 sidebar-animate-in sidebar-visible"
+                    style={{ animationDelay: '250ms' }}
+                  >
+                    <a href="#" className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Database size={18} className="flex-shrink-0" />
+                        <span>Models</span>
+                      </div>
+                      <ChevronRight size={16} className="transition-transform group-hover:translate-x-1" />
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    className="opacity-0 sidebar-animate-in sidebar-visible"
+                    style={{ animationDelay: '300ms' }}
+                  >
+                    <a href="#" className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <BookText size={18} className="flex-shrink-0" />
+                        <span>Documentation</span>
+                      </div>
+                      <ChevronRight size={16} className="transition-transform group-hover:translate-x-1" />
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    className="opacity-0 sidebar-animate-in sidebar-visible"
+                    style={{ animationDelay: '350ms' }}
+                  >
+                    <a href="#" className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Settings size={18} className="flex-shrink-0" />
+                        <span>Settings</span>
+                      </div>
+                      <ChevronRight size={16} className="transition-transform group-hover:translate-x-1" />
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </>
+            )}
+          </SidebarMenu>
+        </SidebarGroup>
+      </SidebarContent>
 
       {/* User profile section */}
-      <div className="sticky bottom-0 border-t border-sidebar-border bg-sidebar p-2 transition-all duration-300">
+      <SidebarFooter className="sticky bottom-0 border-t border-sidebar-border bg-sidebar p-2">
         <Popover>
           <PopoverTrigger asChild>
             <div className={cn(
@@ -314,13 +397,12 @@ export function Sidebar({ className }: SidebarProps) {
             </div>
           </PopoverContent>
         </Popover>
-      </div>
-    </div>
+      </SidebarFooter>
+    </ShadcnSidebar>
   );
 
-  // Mobile sidebar using Sheet component
   return (
-    <>
+    <SidebarProvider defaultOpen={!collapsed}>
       <div className={cn("hidden md:block", className)}>
         <SidebarContent />
       </div>
@@ -349,6 +431,6 @@ export function Sidebar({ className }: SidebarProps) {
           </SheetContent>
         </Sheet>
       </div>
-    </>
+    </SidebarProvider>
   );
 }
