@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useGrocery } from "@/contexts/GroceryContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { convertUsdToBdt, formatCurrency } from "@/utils/currency";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { MetricCard } from "@/components/MetricCard";
 import { AreaChart } from "@/components/AreaChart";
@@ -43,13 +44,13 @@ const Dashboard = () => {
       // Find lists for this month/year
       const matchingLists = lists.filter(list => list.month === month && list.year === year);
       
-      // Calculate total spent for month
-      const totalSpent = matchingLists.reduce((total, list) => total + list.totalEstimatedPrice, 0);
+      // Calculate total spent for month in BDT
+      const totalSpent = matchingLists.reduce((total, list) => total + convertUsdToBdt(list.totalEstimatedPrice), 0);
       
       // Generate some random secondary value for visualization
       const secondaryValue = totalSpent > 0 ? 
         totalSpent * (0.8 + Math.random() * 0.4) : 
-        Math.floor(Math.random() * 100) + 50;
+        Math.floor(Math.random() * 100 * 110.5) + 5525; // Converted to BDT
         
       return {
         name: month.substring(0, 3),
@@ -61,11 +62,13 @@ const Dashboard = () => {
     setChartData(newChartData);
   }, [lists]);
 
-  // Calculate metrics
+  // Calculate metrics in BDT
   const totalLists = lists.length;
   const totalItems = lists.reduce((count, list) => count + list.items.length, 0);
-  const totalSpent = lists.reduce((total, list) => total + list.totalEstimatedPrice, 0);
-  const avgSpentPerList = totalLists > 0 ? totalSpent / totalLists : 0;
+  const totalSpentUsd = lists.reduce((total, list) => total + list.totalEstimatedPrice, 0);
+  const totalSpentBdt = convertUsdToBdt(totalSpentUsd);
+  const avgSpentPerListUsd = totalLists > 0 ? totalSpentUsd / totalLists : 0;
+  const avgSpentPerListBdt = convertUsdToBdt(avgSpentPerListUsd);
 
   if (isLoading) {
     return (
@@ -115,7 +118,7 @@ const Dashboard = () => {
           />
           <MetricCard 
             title={getText("totalSpent", language)} 
-            value={`$${totalSpent.toFixed(2)}`} 
+            value={formatCurrency(totalSpentBdt, 'BDT')} 
             icon={<DollarSign size={18} />} 
             subtext={getText("estimatedTotalExpenses", language)} 
             trend="up" 
@@ -123,7 +126,7 @@ const Dashboard = () => {
           />
           <MetricCard 
             title={getText("avgListCost", language)} 
-            value={`$${avgSpentPerList.toFixed(2)}`} 
+            value={formatCurrency(avgSpentPerListBdt, 'BDT')} 
             icon={<Clock size={18} />} 
             subtext={getText("averagePerGroceryList", language)} 
           />
@@ -134,7 +137,7 @@ const Dashboard = () => {
             <CardHeader>
               <CardTitle>{getText("spendingHistory", language)}</CardTitle>
               <CardDescription>
-                {getText("expensesOverTime", language)}
+                {getText("expensesOverTime", language)} (৳ BDT)
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -191,7 +194,7 @@ const Dashboard = () => {
                               {list.items.length}
                             </TableCell>
                             <TableCell className="text-right">
-                              ${list.totalEstimatedPrice.toFixed(2)}
+                              {formatCurrency(convertUsdToBdt(list.totalEstimatedPrice), 'BDT')}
                             </TableCell>
                           </TableRow>
                         ))}

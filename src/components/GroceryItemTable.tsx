@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useGrocery, GroceryItem } from "@/contexts/GroceryContext";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { convertUsdToBdt, formatCurrency } from "@/utils/currency";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -88,7 +89,9 @@ export function GroceryItemTable({ listId, items, onDelete, isCreatePage = false
                   {item.quantity} {item.unit}
                 </TableCell>
                 <TableCell className="text-right">
-                  {item.estimatedPrice ? `$${item.estimatedPrice.toFixed(2)}` : "N/A"}
+                  {item.estimatedPrice 
+                    ? formatCurrency(convertUsdToBdt(item.estimatedPrice), 'BDT') 
+                    : "N/A"}
                 </TableCell>
                 <TableCell>
                   <DropdownMenu>

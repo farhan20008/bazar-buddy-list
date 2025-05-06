@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGrocery, GroceryItem } from "@/contexts/GroceryContext";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { convertUsdToBdt, formatCurrency } from "@/utils/currency";
 import { getText } from "@/utils/translations";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { GroceryItemForm } from "@/components/GroceryItemForm";
@@ -83,6 +84,9 @@ const CreateList = () => {
   
   // Use the appropriate month names based on language
   const displayMonths = isEnglish ? MONTHS : MONTHS_BN;
+  
+  // Calculate the total price in BDT
+  const totalPriceBdt = items.reduce((total, item) => total + convertUsdToBdt(item.estimatedPrice || 0), 0);
   
   return <DashboardLayout>
       <div className="flex items-center gap-2 mb-6">
@@ -175,8 +179,8 @@ const CreateList = () => {
           <CardTitle>{getText("itemsInList", language)}</CardTitle>
           <CardDescription>
             {isEnglish ? 
-              `${items.length} items • Estimated total: $${items.reduce((total, item) => total + (item.estimatedPrice || 0), 0).toFixed(2)}` : 
-              `${items.length} আইটেম • অনুমানিত মোট: $${items.reduce((total, item) => total + (item.estimatedPrice || 0), 0).toFixed(2)}`}
+              `${items.length} items • Estimated total: ${formatCurrency(totalPriceBdt, 'BDT')}` : 
+              `${items.length} আইটেম • অনুমানিত মোট: ${formatCurrency(totalPriceBdt, 'BDT')}`}
           </CardDescription>
         </CardHeader>
         <CardContent>

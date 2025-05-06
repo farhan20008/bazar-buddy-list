@@ -1,7 +1,9 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGrocery } from "@/contexts/GroceryContext";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { convertUsdToBdt, formatCurrency } from "@/utils/currency";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Calendar, Download, Loader2, Search, ShoppingCart } from "lucide-react";
 import { getText } from "@/utils/translations";
+
 const ListHistory = () => {
   const {
     lists,
@@ -95,6 +98,7 @@ const ListHistory = () => {
                 <TableBody>
                   {filteredLists.map(list => {
                 const createdDate = new Date(list.createdAt);
+                const bdtPrice = convertUsdToBdt(list.totalEstimatedPrice);
                 return <TableRow key={list.id} className="cursor-pointer" onClick={() => navigate(`/edit-list/${list.id}`)}>
                         <TableCell className="font-medium">{list.title}</TableCell>
                         <TableCell>
@@ -105,7 +109,7 @@ const ListHistory = () => {
                         </TableCell>
                         <TableCell>{list.items.length} {getText("items", language)}</TableCell>
                         <TableCell className="text-right">
-                          ${list.totalEstimatedPrice.toFixed(2)}
+                          {formatCurrency(bdtPrice, 'BDT')}
                         </TableCell>
                         <TableCell className="text-right text-muted-foreground">
                           {createdDate.toLocaleDateString()}
