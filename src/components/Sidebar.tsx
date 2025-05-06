@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -6,7 +5,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
 import { 
   ChevronDown, ChevronRight, LogOut, User, 
-  LayoutDashboard, Flask, History, Star, Settings, Database, BookText, 
+  LayoutDashboard, Beaker, History, Star, Settings, Database, BookText, 
   CreditCard, Bell, PlusCircle, ListMusic, ChevronsLeft, ChevronsRight
 } from "lucide-react";
 import { Button } from "./ui/button";
@@ -126,10 +125,10 @@ export function Sidebar({ className }: SidebarProps) {
                 location.pathname === "/playground" && "bg-sidebar-accent text-sidebar-accent-foreground"
               )}>
                 {collapsed ? (
-                  <Flask className="mx-auto" size={20} />
+                  <Beaker className="mx-auto" size={20} />
                 ) : (
                   <>
-                    <Flask size={18} />
+                    <Beaker size={18} />
                     <span className="flex-1 text-left">Playground</span>
                     {playgroundOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
                   </>
