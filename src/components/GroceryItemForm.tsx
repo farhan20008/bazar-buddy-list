@@ -132,7 +132,7 @@ export function GroceryItemForm({
       setIsGeneratingPrice(true);
       const priceUsd = await generatePriceSuggestion(name, parseFloat(quantity) || 1, unit);
       const priceBdt = convertUsdToBdt(priceUsd);
-      setEstimatedPrice(priceBdt.toString());
+      setEstimatedPrice(priceBdt.toFixed(2));
       toast({
         title: isEnglish ? "Price Generated" : "মূল্য তৈরি হয়েছে",
         description: isEnglish ? 
@@ -140,6 +140,7 @@ export function GroceryItemForm({
           `${name} এর অনুমানিত মূল্য: ${formatCurrency(priceBdt, 'BDT')}`
       });
     } catch (error) {
+      console.error("Error generating price:", error);
       toast({
         title: isEnglish ? "Error" : "ত্রুটি",
         description: isEnglish ? "Failed to generate price suggestion." : "মূল্য প্রস্তাব তৈরি করতে ব্যর্থ।",
