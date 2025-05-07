@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useGrocery } from "@/contexts/GroceryContext";
-import { convertUsdToBdt, formatCurrency } from "@/utils/currency";
+import { formatCurrency } from "@/utils/currency";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { GroceryItemForm } from "@/components/GroceryItemForm";
 import { GroceryItemTable } from "@/components/GroceryItemTable";
@@ -121,7 +121,7 @@ const EditList = () => {
   }
   
   const list = getListById(id!);
-  const totalBdtPrice = list ? convertUsdToBdt(list.totalEstimatedPrice) : 0;
+  const totalPrice = list ? list.totalEstimatedPrice : 0;
   
   return <DashboardLayout>
       <div className="flex items-center gap-2 mb-6">
@@ -241,7 +241,7 @@ const EditList = () => {
           <CardTitle>Items in Your List</CardTitle>
           <CardDescription>
             {list?.items.length || 0} items • Estimated total: 
-            {list ? formatCurrency(totalBdtPrice, 'BDT') : "৳0.00"}
+            {list ? formatCurrency(totalPrice, 'BDT') : "৳0.00"}
           </CardDescription>
         </CardHeader>
         <CardContent>

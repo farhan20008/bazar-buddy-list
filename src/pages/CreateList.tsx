@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGrocery, GroceryItem } from "@/contexts/GroceryContext";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { convertUsdToBdt, formatCurrency } from "@/utils/currency";
+import { formatCurrency } from "@/utils/currency";
 import { getText } from "@/utils/translations";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { GroceryItemForm } from "@/components/GroceryItemForm";
@@ -86,7 +86,7 @@ const CreateList = () => {
   const displayMonths = isEnglish ? MONTHS : MONTHS_BN;
   
   // Calculate the total price in BDT
-  const totalPriceBdt = items.reduce((total, item) => total + convertUsdToBdt(item.estimatedPrice || 0), 0);
+  const totalPriceBdt = items.reduce((total, item) => total + (item.estimatedPrice || 0), 0);
   
   return <DashboardLayout>
       <div className="flex items-center gap-2 mb-6">

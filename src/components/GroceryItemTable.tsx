@@ -1,7 +1,8 @@
+
 import { useState } from "react";
 import { useGrocery, GroceryItem } from "@/contexts/GroceryContext";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { convertUsdToBdt, formatCurrency } from "@/utils/currency";
+import { formatCurrency } from "@/utils/currency";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
@@ -66,7 +67,7 @@ export function GroceryItemTable({
                   {item.quantity} {item.unit}
                 </TableCell>
                 <TableCell className="text-right">
-                  {item.estimatedPrice ? formatCurrency(convertUsdToBdt(item.estimatedPrice), 'BDT') : "N/A"}
+                  {item.estimatedPrice ? formatCurrency(item.estimatedPrice, 'BDT') : "N/A"}
                 </TableCell>
                 <TableCell>
                   <DropdownMenu>
