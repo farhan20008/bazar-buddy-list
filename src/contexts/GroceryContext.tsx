@@ -531,61 +531,79 @@ export const GroceryProvider = ({ children }: GroceryProviderProps) => {
     }
   };
 
-  // Mock AI price suggestion generator
-  const generatePriceSuggestion = async (name: string, quantity: number, unit: string): Promise<number> => {
-    // Simulate API call with a delay
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        // Mock logic for price calculation
-        const basePrice = {
-          rice: 5,
-          chicken: 9,
-          beef: 12,
-          eggs: 0.25,
-          milk: 2,
-          bread: 3,
-          oil: 8,
-          sugar: 2,
-          salt: 1,
-          onion: 1,
-          potato: 1,
-          tomato: 1.5,
-        }[name.toLowerCase()] || Math.floor(Math.random() * 10) + 1;
-        
-        let multiplier = 1;
-        
-        switch (unit.toLowerCase()) {
-          case 'kg':
-            multiplier = 1;
-            break;
-          case 'g':
-            multiplier = 0.001;
-            break;
-          case 'lb':
-            multiplier = 0.45;
-            break;
-          case 'dozen':
-            multiplier = 12;
-            break;
-          case 'pcs':
-          case 'pieces':
-            multiplier = 1;
-            break;
-          case 'l':
-          case 'liter':
-            multiplier = 1;
-            break;
-          case 'ml':
-            multiplier = 0.001;
-            break;
-          default:
-            multiplier = 1;
+  // Generate price suggestion using OpenAI
+  const generatePriceSuggestion = async (itemName: string, quantity: number, unit: string): Promise<number> => {
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-price', {
+        body: { 
+          itemName,
+          quantity, 
+          unit 
         }
-        
-        const price = basePrice * quantity * multiplier;
-        resolve(Math.round(price * 100) / 100); // Round to 2 decimal places
-      }, 500);
-    });
+      });
+      
+      if (error) {
+        console.error('Error calling generate-price function:', error);
+        throw new Error(error.message);
+      }
+      
+      if (!data || !data.price) {
+        throw new Error('Failed to generate price suggestion');
+      }
+      
+      // Return the price in USD
+      return data.price;
+    } catch (error) {
+      console.error('Error generating price suggestion:', error);
+      // Fallback to the mock pricing logic
+      const basePrice = {
+        rice: 5,
+        chicken: 9,
+        beef: 12,
+        eggs: 0.25,
+        milk: 2,
+        bread: 3,
+        oil: 8,
+        sugar: 2,
+        salt: 1,
+        onion: 1,
+        potato: 1,
+        tomato: 1.5,
+      }[itemName.toLowerCase()] || Math.floor(Math.random() * 10) + 1;
+      
+      let multiplier = 1;
+      
+      switch (unit.toLowerCase()) {
+        case 'kg':
+          multiplier = 1;
+          break;
+        case 'g':
+          multiplier = 0.001;
+          break;
+        case 'lb':
+          multiplier = 0.45;
+          break;
+        case 'dozen':
+          multiplier = 12;
+          break;
+        case 'pcs':
+        case 'pieces':
+          multiplier = 1;
+          break;
+        case 'l':
+        case 'liter':
+          multiplier = 1;
+          break;
+        case 'ml':
+          multiplier = 0.001;
+          break;
+        default:
+          multiplier = 1;
+      }
+      
+      const price = basePrice * quantity * multiplier;
+      return Math.round(price * 100) / 100; // Round to 2 decimal places
+    }
   };
   
   // Function to download list as PDF
