@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useGrocery, GroceryItem } from "@/contexts/GroceryContext";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { convertUsdToBdt, formatCurrency } from "@/utils/currency";
+import { formatCurrency } from "@/utils/currency";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -40,7 +40,7 @@ export function GroceryItemForm({
   const [unit, setUnit] = useState(item?.unit || "kg");
   const [estimatedPrice, setEstimatedPrice] = useState(
     item?.estimatedPrice ? 
-    convertUsdToBdt(item.estimatedPrice).toString() : 
+    item.estimatedPrice.toString() : 
     "");
   const [isGeneratingPrice, setIsGeneratingPrice] = useState(false);
   const [localLoading, setLocalLoading] = useState(false);
@@ -66,9 +66,7 @@ export function GroceryItemForm({
     setLocalLoading(true);
     try {
       const parsedQuantity = parseFloat(quantity) || 1;
-      const parsedPriceBdt = estimatedPrice ? parseFloat(estimatedPrice) : null;
-      // Convert BDT back to USD for storage
-      const parsedPriceUsd = parsedPriceBdt ? parsedPriceBdt / 110.5 : null;
+      const parsedPrice = estimatedPrice ? parseFloat(estimatedPrice) : null;
       
       if (item) {
         // Update existing item
@@ -76,7 +74,7 @@ export function GroceryItemForm({
           name,
           quantity: parsedQuantity,
           unit,
-          estimatedPrice: parsedPriceUsd
+          estimatedPrice: parsedPrice
         });
       } else if (isCreatePage) {
         // For create page, create temporary item to add to the form
@@ -85,7 +83,7 @@ export function GroceryItemForm({
           name,
           quantity: parsedQuantity,
           unit,
-          estimatedPrice: parsedPriceUsd || 0
+          estimatedPrice: parsedPrice || 0
         };
         
         if (onSubmit) {
@@ -130,14 +128,17 @@ export function GroceryItemForm({
     
     try {
       setIsGeneratingPrice(true);
-      const priceUsd = await generatePriceSuggestion(name, parseFloat(quantity) || 1, unit);
-      const priceBdt = convertUsdToBdt(priceUsd);
+      const priceBdt = await generatePriceSuggestion(name, parseFloat(quantity) || 1, unit);
       setEstimatedPrice(priceBdt.toFixed(2));
+
+      // Format the toast message according to the specified examples
+      const toastDescription = isEnglish ? 
+        `Estimated price for ${quantity} ${unit} of "${name}" in Bangladeshi Taka: ${priceBdt}` :
+        `${quantity} ${unit} "${name}" এর অনুমানিত মূল্য বাংলাদেশি টাকায়: ${priceBdt}`;
+        
       toast({
         title: isEnglish ? "Price Generated" : "মূল্য তৈরি হয়েছে",
-        description: isEnglish ? 
-          `Estimated price for ${name}: ${formatCurrency(priceBdt, 'BDT')}` : 
-          `${name} এর অনুমানিত মূল্য: ${formatCurrency(priceBdt, 'BDT')}`
+        description: toastDescription
       });
     } catch (error) {
       console.error("Error generating price:", error);

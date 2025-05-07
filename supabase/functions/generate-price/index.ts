@@ -25,12 +25,12 @@ serve(async (req) => {
     let prompt;
     if (isBangla) {
       prompt = `আমি বাংলাদেশে একটি গ্রোসারি মূল্য অনুমান করতে চাই। আমার আইটেম হলো ${quantity} ${unit} ${itemName}। 
-      দয়া করে এই আইটেমের জন্য বাংলাদেশে এর গড় বাজার মূল্য USD মূদ্রায় প্রদান করুন।
-      শুধু মূল্য সংখ্যা দিন (মার্কিন ডলারে), কোন অতিরিক্ত ব্যাখ্যা বা টেক্সট নয়। যেমন: 2.50`;
+      দয়া করে এই আইটেমের জন্য বাংলাদেশে এর গড় বাজার মূল্য বাংলাদেশি টাকায় (BDT) প্রদান করুন।
+      শুধু মূল্য সংখ্যা দিন (বাংলাদেশি টাকায়), কোন অতিরিক্ত ব্যাখ্যা বা টেক্সট নয়। যেমন: 140`;
     } else {
       prompt = `I want to estimate the average market price in Bangladesh for a grocery item: ${quantity} ${unit} of ${itemName}. 
-      Please provide the average market price for this item in Bangladesh in USD currency.
-      Provide only the numeric value in USD, no additional explanation or text. For example: 2.50`;
+      Please provide the average market price for this item in Bangladesh in Bangladeshi Taka (BDT).
+      Provide only the numeric value in BDT, no additional explanation or text. For example: 140`;
     }
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -42,7 +42,7 @@ serve(async (req) => {
       body: JSON.stringify({
         model: 'gpt-4o-mini',
         messages: [
-          { role: 'system', content: 'You are a helpful assistant that provides average market prices for grocery items in Bangladesh. Respond with only the numeric price value in USD without any text, currency symbols or explanations.' },
+          { role: 'system', content: 'You are a helpful assistant that provides average market prices for grocery items in Bangladesh. Respond with only the numeric price value in Bangladeshi Taka (BDT) without any text, currency symbols or explanations.' },
           { role: 'user', content: prompt }
         ],
         temperature: 0.1,
