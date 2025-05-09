@@ -1,6 +1,6 @@
 
 import "./App.css";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Outlet } from "react-router-dom";
 import Index from "@/pages/Index";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
@@ -25,7 +25,7 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/print-preview/:id" element={<PrintPreview />} />
-        <Route element={<ProtectedRoute />}>
+        <Route element={<ProtectedRoute><Outlet /></ProtectedRoute>}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/create-list" element={<CreateList />} />
           <Route path="/edit-list/:id" element={<EditList />} />
