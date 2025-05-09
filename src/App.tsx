@@ -1,16 +1,17 @@
+
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { Index } from "@/pages/Index";
-import { Login } from "@/pages/Login";
-import { Register } from "@/pages/Register";
-import { ForgotPassword } from "@/pages/ForgotPassword";
-import { ResetPassword } from "@/pages/ResetPassword";
-import { Dashboard } from "@/pages/Dashboard";
-import { CreateList } from "@/pages/CreateList";
-import { EditList } from "@/pages/EditList";
-import { ListHistory } from "@/pages/ListHistory";
-import { NotFound } from "@/pages/NotFound";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
+import Index from "@/pages/Index";
+import Login from "@/pages/Login";
+import Register from "@/pages/Register";
+import ForgotPassword from "@/pages/ForgotPassword";
+import ResetPassword from "@/pages/ResetPassword";
+import Dashboard from "@/pages/Dashboard";
+import CreateList from "@/pages/CreateList";
+import EditList from "@/pages/EditList";
+import ListHistory from "@/pages/ListHistory";
+import NotFound from "@/pages/NotFound";
+import ProtectedRoute from "@/components/ProtectedRoute";
 import { Toaster } from "@/components/ui/toaster";
 import PrintPreview from "./components/PrintPreview";
 

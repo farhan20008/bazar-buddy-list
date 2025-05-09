@@ -24,14 +24,16 @@ const PrintPreview = () => {
 
   return (
     <div className="p-8 max-w-4xl mx-auto">
-      <style jsx>{`
-        @media print {
-          body {
-            print-color-adjust: exact;
-            -webkit-print-color-adjust: exact;
+      <style>
+        {`
+          @media print {
+            body {
+              print-color-adjust: exact;
+              -webkit-print-color-adjust: exact;
+            }
           }
-        }
-      `}</style>
+        `}
+      </style>
       
       {/* Header */}
       <div className="mb-8">

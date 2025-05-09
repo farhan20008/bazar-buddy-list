@@ -34,22 +34,24 @@ export function PDFPreview({ open, onOpenChange, listId, listName }: PDFPreviewP
           
           {/* Simple HTML representation of the list that can be printed */}
           <div className="print-container p-6">
-            <style jsx>{`
-              @media print {
-                body * {
-                  visibility: hidden;
+            <style>
+              {`
+                @media print {
+                  body * {
+                    visibility: hidden;
+                  }
+                  .print-container, .print-container * {
+                    visibility: visible;
+                  }
+                  .print-container {
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    width: 100%;
+                  }
                 }
-                .print-container, .print-container * {
-                  visibility: visible;
-                }
-                .print-container {
-                  position: absolute;
-                  left: 0;
-                  top: 0;
-                  width: 100%;
-                }
-              }
-            `}</style>
+              `}
+            </style>
             <iframe
               onLoad={() => setLoading(false)}
               className="w-full h-full min-h-[500px] border-none"
