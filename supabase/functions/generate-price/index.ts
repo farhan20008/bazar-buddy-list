@@ -61,7 +61,10 @@ serve(async (req) => {
       throw new Error(`Failed to parse price from response: ${priceText}`);
     }
     
-    return new Response(JSON.stringify({ price }), {
+    // Add 50 BDT to the generated price
+    const adjustedPrice = price + 50;
+    
+    return new Response(JSON.stringify({ price: adjustedPrice }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {

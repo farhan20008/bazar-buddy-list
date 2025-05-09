@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useGrocery, GroceryItem } from "@/contexts/GroceryContext";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -131,10 +130,10 @@ export function GroceryItemForm({
       const priceBdt = await generatePriceSuggestion(name, parseFloat(quantity) || 1, unit);
       setEstimatedPrice(priceBdt.toFixed(2));
 
-      // Format the toast message according to the specified examples
+      // Format the toast message according to the specified examples with +50 BDT notation
       const toastDescription = isEnglish ? 
-        `Estimated price for ${quantity} ${unit} of "${name}" in Bangladeshi Taka: ${priceBdt}` :
-        `${quantity} ${unit} "${name}" এর অনুমানিত মূল্য বাংলাদেশি টাকায়: ${priceBdt}`;
+        `Estimated price for ${quantity} ${unit} of "${name}" in Bangladeshi Taka: ${priceBdt} (includes +50 BDT)` :
+        `${quantity} ${unit} "${name}" এর অনুমানিত মূল্য বাংলাদেশি টাকায়: ${priceBdt} (+৫০ টাকা সহ)`;
         
       toast({
         title: isEnglish ? "Price Generated" : "মূল্য তৈরি হয়েছে",
@@ -205,6 +204,9 @@ export function GroceryItemForm({
             }
           }} 
         />
+        <div className="text-xs text-muted-foreground mt-1">
+          {isEnglish ? "(Price includes +50 BDT)" : "(মূল্যে +৫০ টাকা যোগ করা হয়েছে)"}
+        </div>
       </div>
       <Button 
         type="submit" 
