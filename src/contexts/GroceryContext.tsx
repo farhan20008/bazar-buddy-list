@@ -606,7 +606,7 @@ export const GroceryProvider = ({ children }: GroceryProviderProps) => {
     }
   };
   
-  // Function to download list as PDF
+  // Function to download list as PDF with Bangla support
   const downloadListAsPdf = async (listId: string) => {
     const list = getListById(listId);
     if (!list) {
@@ -625,8 +625,20 @@ export const GroceryProvider = ({ children }: GroceryProviderProps) => {
       const jsPDFModule = await import('jspdf');
       const jsPDF = jsPDFModule.default;
       
-      // Create PDF document
+      // Create PDF document with font support for Bangla
       const doc = new jsPDF();
+      
+      // Add a custom font that supports Bangla
+      // We'll use a base64-encoded Noto Sans Bengali font
+      // First, let's dynamically import the Noto Sans Bengali font
+      await doc.addFont(
+        "https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-bengali@5.0.3/files/noto-sans-bengali-all-400-normal.woff",
+        "NotoSansBengali",
+        "normal"
+      );
+      
+      // Set the font for the document
+      doc.setFont("NotoSansBengali");
       
       // Add title and metadata
       doc.setFontSize(20);
@@ -652,10 +664,10 @@ export const GroceryProvider = ({ children }: GroceryProviderProps) => {
       const autoTableModule = await import('jspdf-autotable');
       const autoTable = autoTableModule.default;
       
-      // Add items table
+      // Add items table with font settings for Bangla
       autoTable(doc, {
         startY: 55,
-        head: [['Item', 'Quantity', 'Unit', 'Est. Price ($)']],
+        head: [['Item', 'Quantity', 'Unit', 'Est. Price (৳)']],
         body: list.items.map(item => [
           item.name,
           item.quantity.toString(),
@@ -663,7 +675,7 @@ export const GroceryProvider = ({ children }: GroceryProviderProps) => {
           (item.estimatedPrice || 0).toFixed(2)
         ]),
         foot: [
-          ['', '', 'Total:', `$${list.totalEstimatedPrice.toFixed(2)}`]
+          ['', '', 'Total:', `৳${list.totalEstimatedPrice.toFixed(2)}`]
         ],
         headStyles: { 
           fillColor: [255, 140, 0],
@@ -675,7 +687,17 @@ export const GroceryProvider = ({ children }: GroceryProviderProps) => {
           textColor: [0, 0, 0],
           fontStyle: 'bold'
         },
-        theme: 'grid'
+        theme: 'grid',
+        styles: {
+          font: 'NotoSansBengali',
+          fontStyle: 'normal'
+        },
+        didDrawPage: function(data) {
+          // Add footer with page number
+          const str = `Page ${doc.getNumberOfPages()}`;
+          doc.setFontSize(10);
+          doc.text(str, data.settings.margin.left, doc.internal.pageSize.height - 10);
+        }
       });
       
       // Save the PDF
