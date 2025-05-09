@@ -30,6 +30,7 @@ function App() {
           <Route path="/create-list" element={<CreateList />} />
           <Route path="/edit-list/:id" element={<EditList />} />
           <Route path="/history" element={<ListHistory />} />
+          <Route path="/list-history" element={<ListHistory />} /> {/* Added this route as an alias */}
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
