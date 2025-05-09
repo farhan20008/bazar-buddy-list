@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGrocery } from "@/contexts/GroceryContext";
@@ -14,6 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { BarChart, Clock, DollarSign, Loader2, Plus, ShoppingCart } from "lucide-react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { getText } from "@/utils/translations";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Dashboard = () => {
   const { lists, isLoading } = useGrocery();
@@ -70,6 +70,8 @@ const Dashboard = () => {
   const avgSpentPerListUsd = totalLists > 0 ? totalSpentUsd / totalLists : 0;
   const avgSpentPerListBdt = convertUsdToBdt(avgSpentPerListUsd);
 
+  const isMobile = useIsMobile();
+
   if (isLoading) {
     return (
       <DashboardLayout>
@@ -83,16 +85,16 @@ const Dashboard = () => {
   return (
     <DashboardLayout>
       <div className="w-full">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-6 gap-2 sm:gap-0">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
               {getText("dashboardTitle", language)}
             </h1>
             <p className="text-muted-foreground">
               {getText("welcome", language)} {userName}
             </p>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4 mt-2 sm:mt-0">
             <LanguageSwitcher />
             <Button 
               onClick={() => navigate("/create-list")} 
@@ -103,7 +105,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-2 sm:gap-4 grid-cols-2 sm:grid-cols-4">
           <MetricCard 
             title={getText("totalLists", language)} 
             value={totalLists} 
@@ -132,36 +134,37 @@ const Dashboard = () => {
           />
         </div>
 
-        <div className="grid gap-4 md:grid-cols-7 mt-4">
+        <div className="grid gap-2 sm:gap-4 md:grid-cols-7 mt-2 sm:mt-4">
           <Card className="card-gradient md:col-span-4">
-            <CardHeader>
+            <CardHeader className={isMobile ? "px-3 py-3" : ""}>
               <CardTitle>{getText("spendingHistory", language)}</CardTitle>
               <CardDescription>
                 {getText("expensesOverTime", language)} (৳ BDT)
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <AreaChart data={chartData} height={250} />
+            <CardContent className={isMobile ? "px-1 py-1" : ""}>
+              <AreaChart data={chartData} height={isMobile ? 200 : 250} />
             </CardContent>
           </Card>
           
           <Card className="card-gradient md:col-span-3">
-            <CardHeader>
+            <CardHeader className={isMobile ? "px-3 py-3" : ""}>
               <CardTitle>{getText("recentLists", language)}</CardTitle>
               <CardDescription>
                 {getText("recentlyCreatedLists", language)}
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className={isMobile ? "px-3 py-2" : ""}>
               {lists.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-8 text-center">
-                  <ShoppingCart className="h-12 w-12 text-muted-foreground/50 mb-4" />
-                  <p className="text-muted-foreground mb-4">
+                <div className="flex flex-col items-center justify-center py-4 sm:py-8 text-center">
+                  <ShoppingCart className="h-8 sm:h-12 w-8 sm:w-12 text-muted-foreground/50 mb-2 sm:mb-4" />
+                  <p className="text-muted-foreground mb-2 sm:mb-4">
                     {getText("noListsYet", language)}
                   </p>
                   <Button 
                     onClick={() => navigate("/create-list")} 
                     className="text-gray-50 bg-orange-600 hover:bg-orange-500"
+                    size={isMobile ? "sm" : "default"}
                   >
                     <Plus className="mr-2 h-4 w-4" /> {getText("createFirstList", language)}
                   </Button>
@@ -171,9 +174,15 @@ const Dashboard = () => {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>{getText("listName", language)}</TableHead>
-                        <TableHead className="text-right">{getText("items", language)}</TableHead>
-                        <TableHead className="text-right">{getText("estCost", language)}</TableHead>
+                        <TableHead className={isMobile ? "py-2 px-2" : ""}>
+                          {getText("listName", language)}
+                        </TableHead>
+                        <TableHead className={`text-right ${isMobile ? "py-2 px-2" : ""}`}>
+                          {getText("items", language)}
+                        </TableHead>
+                        <TableHead className={`text-right ${isMobile ? "py-2 px-2" : ""}`}>
+                          {getText("estCost", language)}
+                        </TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -187,13 +196,13 @@ const Dashboard = () => {
                             className="cursor-pointer" 
                             onClick={() => navigate(`/edit-list/${list.id}`)}
                           >
-                            <TableCell className="font-medium">
+                            <TableCell className={`font-medium ${isMobile ? "py-2 px-2" : ""}`}>
                               {list.title}
                             </TableCell>
-                            <TableCell className="text-right">
+                            <TableCell className={`text-right ${isMobile ? "py-2 px-2" : ""}`}>
                               {list.items.length}
                             </TableCell>
-                            <TableCell className="text-right">
+                            <TableCell className={`text-right ${isMobile ? "py-2 px-2" : ""}`}>
                               {formatCurrency(convertUsdToBdt(list.totalEstimatedPrice), 'BDT')}
                             </TableCell>
                           </TableRow>
