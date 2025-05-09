@@ -9,48 +9,42 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Loader2, Plus, Sparkles } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { v4 as uuidv4 } from "uuid";
-
 interface GroceryItemFormProps {
   listId: string;
   item?: GroceryItem;
   onSubmit?: (item?: GroceryItem) => void;
   isCreatePage?: boolean;
 }
-
 const UNITS = ["kg", "g", "lb", "pcs", "l", "ml", "dozen"];
 const UNITS_BN = ["কেজি", "গ্রাম", "পাউন্ড", "পিস", "লিটার", "মিলিলিটার", "ডজন"];
-
 export function GroceryItemForm({
   listId,
   item,
   onSubmit,
   isCreatePage = false
 }: GroceryItemFormProps) {
-  const { language, isEnglish } = useLanguage();
+  const {
+    language,
+    isEnglish
+  } = useLanguage();
   const {
     addItemToList,
     updateItemInList,
     generatePriceSuggestion,
     isLoading
   } = useGrocery();
-  
   const [name, setName] = useState(item?.name || "");
   const [quantity, setQuantity] = useState(item?.quantity.toString() || "1");
   const [unit, setUnit] = useState(item?.unit || "kg");
-  const [estimatedPrice, setEstimatedPrice] = useState(
-    item?.estimatedPrice ? 
-    item.estimatedPrice.toString() : 
-    "");
+  const [estimatedPrice, setEstimatedPrice] = useState(item?.estimatedPrice ? item.estimatedPrice.toString() : "");
   const [isGeneratingPrice, setIsGeneratingPrice] = useState(false);
   const [localLoading, setLocalLoading] = useState(false);
-  
   const handleQuantityChange = (value: string) => {
     // Only allow positive numbers
     if (!value || /^\d*\.?\d*$/.test(value)) {
       setQuantity(value);
     }
   };
-  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name) {
@@ -61,12 +55,10 @@ export function GroceryItemForm({
       });
       return;
     }
-    
     setLocalLoading(true);
     try {
       const parsedQuantity = parseFloat(quantity) || 1;
       const parsedPrice = estimatedPrice ? parseFloat(estimatedPrice) : null;
-      
       if (item) {
         // Update existing item
         await updateItemInList(listId, item.id, {
@@ -78,13 +70,13 @@ export function GroceryItemForm({
       } else if (isCreatePage) {
         // For create page, create temporary item to add to the form
         const newItem: GroceryItem = {
-          id: uuidv4(), // Generate temporary ID
+          id: uuidv4(),
+          // Generate temporary ID
           name,
           quantity: parsedQuantity,
           unit,
           estimatedPrice: parsedPrice || 0
         };
-        
         if (onSubmit) {
           onSubmit(newItem);
         }
@@ -104,7 +96,6 @@ export function GroceryItemForm({
         setUnit("kg");
         setEstimatedPrice("");
       }
-      
       if (onSubmit && !isCreatePage) {
         onSubmit(item);
       }
@@ -114,7 +105,6 @@ export function GroceryItemForm({
       setLocalLoading(false);
     }
   };
-  
   const handleGeneratePrice = async () => {
     if (!name || !quantity) {
       toast({
@@ -124,17 +114,13 @@ export function GroceryItemForm({
       });
       return;
     }
-    
     try {
       setIsGeneratingPrice(true);
       const priceBdt = await generatePriceSuggestion(name, parseFloat(quantity) || 1, unit);
       setEstimatedPrice(priceBdt.toFixed(2));
 
       // Format the toast message according to the specified examples with +50 BDT notation
-      const toastDescription = isEnglish ? 
-        `Estimated price for ${quantity} ${unit} of "${name}" in Bangladeshi Taka: ${priceBdt} (includes +50 BDT)` :
-        `${quantity} ${unit} "${name}" এর অনুমানিত মূল্য বাংলাদেশি টাকায়: ${priceBdt} (+৫০ টাকা সহ)`;
-        
+      const toastDescription = isEnglish ? `Estimated price for ${quantity} ${unit} of "${name}" in Bangladeshi Taka: ${priceBdt} (includes +50 BDT)` : `${quantity} ${unit} "${name}" এর অনুমানিত মূল্য বাংলাদেশি টাকায়: ${priceBdt} (+৫০ টাকা সহ)`;
       toast({
         title: isEnglish ? "Price Generated" : "মূল্য তৈরি হয়েছে",
         description: toastDescription
@@ -150,7 +136,6 @@ export function GroceryItemForm({
       setIsGeneratingPrice(false);
     }
   };
-  
   return <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-1.5">
         <Label htmlFor="name">{isEnglish ? "Item Name" : "আইটেমের নাম"}</Label>
@@ -178,51 +163,23 @@ export function GroceryItemForm({
       <div className="space-y-1.5">
         <div className="flex items-center justify-between">
           <Label htmlFor="price">{isEnglish ? "Estimated Price (BDT)" : "অনুমানিত মূল্য (৳)"}</Label>
-          <Button 
-            type="button" 
-            size="sm" 
-            variant="outline" 
-            onClick={handleGeneratePrice} 
-            disabled={isGeneratingPrice || !name || !quantity}
-          >
-            {isGeneratingPrice ? 
-              <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : 
-              <Sparkles className="mr-1.5 h-3.5 w-3.5" />
-            }
+          <Button type="button" size="sm" variant="outline" onClick={handleGeneratePrice} disabled={isGeneratingPrice || !name || !quantity}>
+            {isGeneratingPrice ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <Sparkles className="mr-1.5 h-3.5 w-3.5" />}
             {isEnglish ? "Generate" : "তৈরি করুন"}
           </Button>
         </div>
-        <Input 
-          id="price" 
-          type="text" 
-          inputMode="decimal" 
-          placeholder="0.00" 
-          value={estimatedPrice} 
-          onChange={e => {
-            if (!e.target.value || /^\d*\.?\d*$/.test(e.target.value)) {
-              setEstimatedPrice(e.target.value);
-            }
-          }} 
-        />
-        <div className="text-xs text-muted-foreground mt-1">
-          {isEnglish ? "(Price includes +50 BDT)" : "(মূল্যে +৫০ টাকা যোগ করা হয়েছে)"}
-        </div>
+        <Input id="price" type="text" inputMode="decimal" placeholder="0.00" value={estimatedPrice} onChange={e => {
+        if (!e.target.value || /^\d*\.?\d*$/.test(e.target.value)) {
+          setEstimatedPrice(e.target.value);
+        }
+      }} />
+        
       </div>
-      <Button 
-        type="submit" 
-        className="w-full bg-orange-600 hover:bg-orange-500 text-gray-50"
-        disabled={isLoading || localLoading}
-      >
-        {isLoading || localLoading ? (
-          <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
-        ) : item ? (
-          isEnglish ? "Update Item" : "আইটেম আপডেট করুন"
-        ) : (
-          <>
+      <Button type="submit" className="w-full bg-orange-600 hover:bg-orange-500 text-gray-50" disabled={isLoading || localLoading}>
+        {isLoading || localLoading ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : item ? isEnglish ? "Update Item" : "আইটেম আপডেট করুন" : <>
             <Plus className="mr-1.5 h-4 w-4" /> 
             {isEnglish ? "Add Item" : "আইটেম যোগ করুন"}
-          </>
-        )}
+          </>}
       </Button>
     </form>;
 }
