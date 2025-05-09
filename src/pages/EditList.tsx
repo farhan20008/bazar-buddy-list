@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useGrocery } from "@/contexts/GroceryContext";
@@ -14,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { ArrowLeft, Download, Loader2, Save, Trash } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
+import { PDFPreview } from "@/components/PDFPreview";
 
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const CURRENT_YEAR = new Date().getFullYear();
@@ -41,6 +41,7 @@ const EditList = () => {
   const [selectedYear, setSelectedYear] = useState("");
   const [localLoading, setLocalLoading] = useState(true);
   const [listExists, setListExists] = useState(false);
+  const [showPDFPreview, setShowPDFPreview] = useState(false);
   
   useEffect(() => {
     if (id) {
@@ -103,7 +104,13 @@ const EditList = () => {
         await downloadListAsPdf(id);
       } catch (error) {
         console.error("Error downloading PDF:", error);
-        // Error is already handled in the context
+        // If PDF generation fails, offer the preview option
+        toast({
+          title: "PDF Generation Issue",
+          description: "Try using the preview option instead",
+          variant: "destructive"
+        });
+        setShowPDFPreview(true);
       }
     }
   };
@@ -135,6 +142,13 @@ const EditList = () => {
           </p>
         </div>
         <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            onClick={() => setShowPDFPreview(true)}
+            className="hidden md:flex"
+          >
+            Preview PDF
+          </Button>
           <Button variant="outline" onClick={handleDownloadPdf} disabled={isLoading}>
             <Download className="h-4 w-4 mr-2" />
             Download PDF
@@ -164,6 +178,14 @@ const EditList = () => {
           </AlertDialog>
         </div>
       </div>
+
+      {/* PDF Preview Dialog */}
+      <PDFPreview 
+        open={showPDFPreview}
+        onOpenChange={setShowPDFPreview}
+        listId={id!}
+        listName={title}
+      />
 
       <div className="grid gap-6 md:grid-cols-2">
         {/* List Details */}
