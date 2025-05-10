@@ -104,12 +104,12 @@ const EditList = () => {
         await downloadListAsPdf(id);
       } catch (error) {
         console.error("Error downloading PDF:", error);
-        // If PDF generation fails, offer the preview option
         toast({
           title: "PDF Generation Issue",
-          description: "Try using the preview option instead",
+          description: "Unable to download PDF, opening preview instead",
           variant: "destructive"
         });
+        // Always open preview as fallback
         setShowPDFPreview(true);
       }
     }
@@ -145,7 +145,7 @@ const EditList = () => {
           <Button 
             variant="outline" 
             onClick={() => setShowPDFPreview(true)}
-            className="hidden md:flex"
+            className="flex items-center"
           >
             Preview PDF
           </Button>
