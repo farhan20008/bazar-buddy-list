@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGrocery, GroceryItem } from "@/contexts/GroceryContext";
@@ -15,7 +14,6 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, Loader2, Save } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
-
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({
@@ -24,10 +22,12 @@ const YEARS = Array.from({
 
 // Bengali month names
 const MONTHS_BN = ["জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন", "জুলাই", "আগস্ট", "সেপ্টেম্বর", "অক্টোবর", "নভেম্বর", "ডিসেম্বর"];
-
 const CreateList = () => {
   const navigate = useNavigate();
-  const { language, isEnglish } = useLanguage();
+  const {
+    language,
+    isEnglish
+  } = useLanguage();
   const {
     createList,
     isLoading
@@ -38,7 +38,6 @@ const CreateList = () => {
   const [selectedMonth, setSelectedMonth] = useState(MONTHS[currentMonth]);
   const [selectedYear, setSelectedYear] = useState(CURRENT_YEAR.toString());
   const [items, setItems] = useState<GroceryItem[]>([]);
-  
   const handleCreateList = async () => {
     if (!title) {
       toast({
@@ -56,7 +55,6 @@ const CreateList = () => {
       });
       return;
     }
-    
     try {
       const listId = await createList({
         title,
@@ -64,30 +62,25 @@ const CreateList = () => {
         year: parseInt(selectedYear),
         items
       });
-      
       navigate(`/edit-list/${listId}`);
     } catch (error) {
       console.error("Error creating list:", error);
       // Error is already handled in the context
     }
   };
-  
   const addItemToList = (item: GroceryItem) => {
     setItems([...items, item]);
   };
-  
   const removeItemFromList = (id: string) => {
     setItems(items.filter(item => item.id !== id));
   };
-  
   const tempListId = "temp-new-list";
-  
+
   // Use the appropriate month names based on language
   const displayMonths = isEnglish ? MONTHS : MONTHS_BN;
-  
+
   // Calculate the total price in BDT
   const totalPriceBdt = items.reduce((total, item) => total + (item.estimatedPrice || 0), 0);
-  
   return <DashboardLayout>
       <div className="flex items-center gap-2 mb-6">
         <Button variant="outline" size="icon" onClick={() => navigate(-1)}>
@@ -95,7 +88,7 @@ const CreateList = () => {
         </Button>
         <div>
           <h1 className="text-3xl font-bold tracking-tight">{getText("createNewList", language)}</h1>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground text-left">
             {getText("addItems", language)}
           </p>
         </div>
@@ -164,11 +157,7 @@ const CreateList = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <GroceryItemForm 
-              listId={tempListId} 
-              onSubmit={newItem => newItem && addItemToList(newItem)} 
-              isCreatePage={true} 
-            />
+            <GroceryItemForm listId={tempListId} onSubmit={newItem => newItem && addItemToList(newItem)} isCreatePage={true} />
           </CardContent>
         </Card>
       </div>
@@ -178,9 +167,7 @@ const CreateList = () => {
         <CardHeader>
           <CardTitle>{getText("itemsInList", language)}</CardTitle>
           <CardDescription>
-            {isEnglish ? 
-              `${items.length} items • Estimated total: ${formatCurrency(totalPriceBdt, 'BDT')}` : 
-              `${items.length} আইটেম • অনুমানিত মোট: ${formatCurrency(totalPriceBdt, 'BDT')}`}
+            {isEnglish ? `${items.length} items • Estimated total: ${formatCurrency(totalPriceBdt, 'BDT')}` : `${items.length} আইটেম • অনুমানিত মোট: ${formatCurrency(totalPriceBdt, 'BDT')}`}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -189,5 +176,4 @@ const CreateList = () => {
       </Card>
     </DashboardLayout>;
 };
-
 export default CreateList;
