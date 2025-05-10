@@ -35,35 +35,38 @@ export function PDFPreview({ open, onOpenChange, listId, listName }: PDFPreviewP
 
   const handlePrint = () => {
     try {
-      const iframe = document.getElementById("preview-iframe") as HTMLIFrameElement;
-      if (iframe && iframe.contentWindow) {
-        iframe.contentWindow.print();
-        toast({
-          title: getText("printInitiated", language) || "Print Initiated",
-          description: getText("printInProgress", language) || "Your print dialog should open shortly"
-        });
-      } else {
-        // Fallback if iframe printing doesn't work
-        const printWindow = window.open(printUrl, '_blank');
-        if (printWindow) {
-          printWindow.addEventListener('load', () => {
-            try {
+      // Using the more reliable window.open approach for better font rendering
+      const printWindow = window.open(printUrl, '_blank');
+      if (printWindow) {
+        printWindow.addEventListener('load', () => {
+          try {
+            setTimeout(() => {
               printWindow.print();
               toast({
                 title: getText("printInitiated", language) || "Print Initiated",
-                description: getText("printInProgress", language) || "Your print dialog should open shortly"
+                description: getText("printInProgress", language) || "Print dialog will open shortly"
               });
-            } catch (err) {
-              console.error("Error during printing:", err);
-              toast({
-                title: getText("printError", language) || "Print Error",
-                description: getText("printErrorDesc", language) || "Could not open print dialog",
-                variant: "destructive"
-              });
-            }
+            }, 1000); // Give a little time for fonts to load
+          } catch (err) {
+            console.error("Error during printing:", err);
+            toast({
+              title: getText("printError", language) || "Print Error",
+              description: getText("printErrorDesc", language) || "Could not open print dialog",
+              variant: "destructive"
+            });
+          }
+        });
+      } else {
+        // Fallback to iframe printing if window.open fails (due to popup blockers)
+        const iframe = document.getElementById("preview-iframe") as HTMLIFrameElement;
+        if (iframe && iframe.contentWindow) {
+          iframe.contentWindow.print();
+          toast({
+            title: getText("printInitiated", language) || "Print Initiated",
+            description: getText("printInProgress", language) || "Your print dialog should open shortly"
           });
         } else {
-          throw new Error("Could not open print window");
+          throw new Error("Could not access iframe for printing");
         }
       }
     } catch (error) {
@@ -99,7 +102,7 @@ export function PDFPreview({ open, onOpenChange, listId, listName }: PDFPreviewP
         console.error("Error checking iframe:", e);
         setHasError(true);
       }
-    }, 800); // Give it a bit more time to render properly
+    }, 1000); // Give it a bit more time to render properly
   };
 
   const handleRetry = () => {

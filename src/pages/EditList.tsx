@@ -106,10 +106,10 @@ const EditList = () => {
         console.error("Error downloading PDF:", error);
         toast({
           title: "PDF Generation Issue",
-          description: "Unable to download PDF, opening preview instead",
+          description: "Using preview mode for better Bangla support",
           variant: "destructive"
         });
-        // Always open preview as fallback
+        // Open preview as fallback for better Bangla support
         setShowPDFPreview(true);
       }
     }
@@ -149,9 +149,14 @@ const EditList = () => {
           >
             Preview PDF
           </Button>
-          <Button variant="outline" onClick={handleDownloadPdf} disabled={isLoading}>
-            <Download className="h-4 w-4 mr-2" />
-            Download PDF
+          <Button 
+            variant="outline" 
+            onClick={handleDownloadPdf} 
+            disabled={isLoading}
+            className="flex items-center gap-2"
+          >
+            <Download className="h-4 w-4" />
+            Print
           </Button>
           <AlertDialog>
             <AlertDialogTrigger asChild>
