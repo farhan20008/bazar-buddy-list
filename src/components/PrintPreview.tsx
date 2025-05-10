@@ -33,7 +33,7 @@ const PrintPreview = () => {
             body {
               print-color-adjust: exact;
               -webkit-print-color-adjust: exact;
-              font-family: Arial, Hind Siliguri, sans-serif;
+              font-family: Arial, sans-serif;
             }
             
             @page {
@@ -46,6 +46,7 @@ const PrintPreview = () => {
               padding: 8px;
               text-align: left;
               border: 1px solid #ddd;
+              font-family: Arial, sans-serif;
             }
             
             .print-table th {
@@ -60,9 +61,17 @@ const PrintPreview = () => {
             .price-column {
               text-align: right !important;
             }
+
+            /* Ensure Bangla text displays properly */
+            * {
+              font-family: 'Noto Sans Bengali', Arial, sans-serif !important;
+            }
           }
         `}
       </style>
+      
+      {/* Add Noto Sans Bengali font for Bangla character support */}
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;700&display=swap" />
       
       {/* Header */}
       <div className="mb-8">
@@ -74,7 +83,7 @@ const PrintPreview = () => {
       </div>
       
       {/* Items Table with improved handling of Bangla characters */}
-      <Table className="w-full print-table">
+      <Table className="w-full print-table" style={{ fontFamily: "'Noto Sans Bengali', Arial, sans-serif" }}>
         <TableHeader>
           <TableRow className="bg-orange-600 text-white">
             <TableHead className="border border-gray-300">Item</TableHead>
