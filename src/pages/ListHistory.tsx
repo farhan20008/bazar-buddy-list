@@ -153,7 +153,7 @@ const ListHistory = () => {
       <Card>
         <CardHeader>
           <CardTitle className="text-left">{getText("yourGroceryLists", language)}</CardTitle>
-          <CardDescription>
+          <CardDescription className="text-left">
             {filteredLists.length} {getText("listsTotal", language)}
           </CardDescription>
         </CardHeader>
