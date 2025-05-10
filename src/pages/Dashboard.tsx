@@ -86,7 +86,7 @@ const Dashboard = () => {
       <div className="w-full">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-6 gap-2 sm:gap-0">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-left">
               {getText("dashboardTitle", language)}
             </h1>
             <p className="text-muted-foreground">
