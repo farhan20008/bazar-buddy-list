@@ -166,7 +166,7 @@ const CreateList = () => {
       <Card className="mt-6">
         <CardHeader>
           <CardTitle className="text-left">{getText("itemsInList", language)}</CardTitle>
-          <CardDescription>
+          <CardDescription className="text-left">
             {isEnglish ? `${items.length} items • Estimated total: ${formatCurrency(totalPriceBdt, 'BDT')}` : `${items.length} আইটেম • অনুমানিত মোট: ${formatCurrency(totalPriceBdt, 'BDT')}`}
           </CardDescription>
         </CardHeader>
