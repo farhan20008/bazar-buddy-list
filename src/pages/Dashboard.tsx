@@ -124,7 +124,7 @@ const Dashboard = () => {
           <Card className="card-gradient md:col-span-3">
             <CardHeader className={isMobile ? "px-3 py-3" : ""}>
               <CardTitle className="text-left">{getText("recentLists", language)}</CardTitle>
-              <CardDescription>
+              <CardDescription className="text-left">
                 {getText("recentlyCreatedLists", language)}
               </CardDescription>
             </CardHeader>
