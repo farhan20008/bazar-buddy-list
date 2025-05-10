@@ -17,7 +17,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     <div className={`flex min-h-screen w-full bg-background ${fontClass}`}>
       <Sidebar className="flex-shrink-0" />
       <main className="flex-1 overflow-y-auto">
-        <div className={`container ${isMobile ? "px-3 py-4" : "px-6 py-8"} max-w-7xl`}>
+        <div className={`container ${isMobile ? "px-4 py-4" : "px-6 py-6"} max-w-7xl`}>
           {children}
         </div>
       </main>
