@@ -94,6 +94,38 @@ const CreateList = () => {
         </div>
       </div>
 
+      {/* Quick Stats Card */}
+      <Card className="mb-6 bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20 border-orange-200 dark:border-orange-800">
+        <CardContent className="p-6">
+          <div className="grid grid-cols-3 gap-4 text-center">
+            <div className="space-y-1">
+              <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                {items.length}
+              </div>
+              <p className="text-sm text-muted-foreground">
+                {isEnglish ? "Items Added" : "আইটেম যোগ করা হয়েছে"}
+              </p>
+            </div>
+            <div className="space-y-1">
+              <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                {formatCurrency(totalPriceBdt, 'BDT').replace('BDT ', '৳')}
+              </div>
+              <p className="text-sm text-muted-foreground">
+                {isEnglish ? "Estimated Total" : "অনুমানিত মোট"}
+              </p>
+            </div>
+            <div className="space-y-1">
+              <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                {selectedMonth}
+              </div>
+              <p className="text-sm text-muted-foreground">
+                {isEnglish ? "Selected Month" : "নির্বাচিত মাস"}
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       <div className="grid gap-6 md:grid-cols-2">
         {/* List Details Card */}
         <Card>
