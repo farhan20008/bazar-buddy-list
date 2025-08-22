@@ -6,9 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Plus, Sparkles } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Loader2, Plus, Sparkles, Upload, History, Globe } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { v4 as uuidv4 } from "uuid";
+import { FileUploadDropzone } from "./FileUploadDropzone";
+import { ItemSuggestions } from "./ItemSuggestions";
 interface GroceryItemFormProps {
   listId: string;
   item?: GroceryItem;
@@ -136,11 +140,69 @@ export function GroceryItemForm({
       setIsGeneratingPrice(false);
     }
   };
-  return <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-1.5">
-        <Label htmlFor="name">{isEnglish ? "Item Name" : "আইটেমের নাম"}</Label>
-        <Input id="name" placeholder={isEnglish ? "e.g., Rice, Chicken, Eggs" : "যেমন, চাল, মুরগি, ডিম"} value={name} onChange={e => setName(e.target.value)} />
-      </div>
+
+  const handleFileProcessed = (extractedText: string) => {
+    // Parse extracted text and populate the first item found
+    const lines = extractedText.trim().split('\n').filter(line => line.trim());
+    if (lines.length > 0) {
+      const firstLine = lines[0].trim();
+      // Simple parsing - you could make this more sophisticated
+      const parts = firstLine.split('-').map(p => p.trim());
+      if (parts.length >= 2) {
+        setName(parts[0]);
+        const quantityMatch = parts[1].match(/(\d+(?:\.\d+)?)\s*(\w+)/);
+        if (quantityMatch) {
+          setQuantity(quantityMatch[1]);
+          setUnit(quantityMatch[2] || 'kg');
+        }
+      }
+    }
+  };
+
+  const handleItemSuggestionSelect = (item: { name: string; price: number; unit: string }) => {
+    setName(item.name);
+    setQuantity('1');
+    setUnit(item.unit);
+    setEstimatedPrice(item.price.toString());
+  };
+  return (
+    <div className="space-y-6">
+      {/* Enhanced Input Options */}
+      <Tabs defaultValue="manual" className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="manual">
+            <Plus className="mr-2 h-4 w-4" />
+            {isEnglish ? "Manual" : "ম্যানুয়াল"}
+          </TabsTrigger>
+          <TabsTrigger value="upload">
+            <Upload className="mr-2 h-4 w-4" />
+            {isEnglish ? "Upload" : "আপলোড"}
+          </TabsTrigger>
+          <TabsTrigger value="suggestions">
+            <Sparkles className="mr-2 h-4 w-4" />
+            {isEnglish ? "Suggestions" : "সাজেশন"}
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="upload" className="mt-4">
+          <FileUploadDropzone onFilesProcessed={handleFileProcessed} />
+        </TabsContent>
+
+        <TabsContent value="suggestions" className="mt-4">
+          <ItemSuggestions onItemSelect={handleItemSuggestionSelect} />
+        </TabsContent>
+
+        <TabsContent value="manual" className="mt-4">
+          {/* Original Manual Form */}
+        </TabsContent>
+      </Tabs>
+
+      {/* Always visible form for manual entry or editing suggested items */}
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-1.5">
+          <Label htmlFor="name">{isEnglish ? "Item Name" : "আইটেমের নাম"}</Label>
+          <Input id="name" placeholder={isEnglish ? "e.g., Rice, Chicken, Eggs" : "যেমন, চাল, মুরগি, ডিম"} value={name} onChange={e => setName(e.target.value)} />
+        </div>
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
           <Label htmlFor="quantity">{isEnglish ? "Quantity" : "পরিমাণ"}</Label>
@@ -175,11 +237,13 @@ export function GroceryItemForm({
       }} />
         
       </div>
-      <Button type="submit" className="w-full bg-orange-600 hover:bg-orange-500 text-gray-50" disabled={isLoading || localLoading}>
-        {isLoading || localLoading ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : item ? isEnglish ? "Update Item" : "আইটেম আপডেট করুন" : <>
-            <Plus className="mr-1.5 h-4 w-4" /> 
-            {isEnglish ? "Add Item" : "আইটেম যোগ করুন"}
-          </>}
-      </Button>
-    </form>;
+        <Button type="submit" className="w-full bg-orange-600 hover:bg-orange-500 text-gray-50" disabled={isLoading || localLoading}>
+          {isLoading || localLoading ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : item ? isEnglish ? "Update Item" : "আইটেম আপডেট করুন" : <>
+              <Plus className="mr-1.5 h-4 w-4" /> 
+              {isEnglish ? "Add Item" : "আইটেম যোগ করুন"}
+            </>}
+        </Button>
+      </form>
+    </div>
+  );
 }
