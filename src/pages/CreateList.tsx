@@ -12,7 +12,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Loader2, Save } from "lucide-react";
+import { ArrowLeft, Loader2, Save, Sparkles } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const CURRENT_YEAR = new Date().getFullYear();
@@ -136,6 +136,18 @@ const CreateList = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            {/* Tips Section */}
+            <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 space-y-2">
+              <h4 className="font-medium text-blue-900 dark:text-blue-200 flex items-center gap-2">
+                <Sparkles className="h-4 w-4" />
+                {isEnglish ? "Pro Tips" : "প্রো টিপস"}
+              </h4>
+              <ul className="text-sm text-blue-800 dark:text-blue-300 space-y-1">
+                <li>• {isEnglish ? "Use descriptive titles like 'Monthly Groceries' or 'Party Shopping'" : "বর্ণনামূলক শিরোনাম ব্যবহার করুন যেমন 'মাসিক মুদি' বা 'পার্টি কেনাকাটা'"}</li>
+                <li>• {isEnglish ? "Upload photos of handwritten lists for quick item extraction" : "দ্রুত আইটেম নিষ্কাশনের জন্য হাতে লেখা তালিকার ছবি আপলোড করুন"}</li>
+                <li>• {isEnglish ? "Browse popular Bangladeshi items with estimated prices" : "অনুমানিত দামসহ জনপ্রিয় বাংলাদেশি আইটেম ব্রাউজ করুন"}</li>
+              </ul>
+            </div>
             <div className="space-y-1.5">
               <Label htmlFor="title">{getText("listTitle", language)}</Label>
               <Input id="title" placeholder={isEnglish ? "April Groceries" : "এপ্রিল মুদি"} value={title} onChange={e => setTitle(e.target.value)} />
