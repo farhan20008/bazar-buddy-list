@@ -142,20 +142,70 @@ export function GroceryItemForm({
   };
 
   const handleFileProcessed = (extractedText: string) => {
-    // Parse extracted text and populate the first item found
+    // Parse extracted text and create multiple items
     const lines = extractedText.trim().split('\n').filter(line => line.trim());
-    if (lines.length > 0) {
-      const firstLine = lines[0].trim();
-      // Simple parsing - you could make this more sophisticated
-      const parts = firstLine.split('-').map(p => p.trim());
-      if (parts.length >= 2) {
-        setName(parts[0]);
-        const quantityMatch = parts[1].match(/(\d+(?:\.\d+)?)\s*(\w+)/);
-        if (quantityMatch) {
-          setQuantity(quantityMatch[1]);
-          setUnit(quantityMatch[2] || 'kg');
+    const parsedItems: GroceryItem[] = [];
+    
+    lines.forEach(line => {
+      const trimmedLine = line.trim();
+      if (trimmedLine) {
+        // Try different parsing patterns
+        let itemName = "";
+        let itemQuantity = 1;
+        let itemUnit = "kg";
+        let itemPrice = 0;
+        
+        // Pattern 1: "Item - quantity unit" or "Item - quantity"
+        const dashPattern = trimmedLine.split('-').map(p => p.trim());
+        if (dashPattern.length >= 2) {
+          itemName = dashPattern[0];
+          const quantityPart = dashPattern[1];
+          const quantityMatch = quantityPart.match(/(\d+(?:\.\d+)?)\s*(\w+)?/);
+          if (quantityMatch) {
+            itemQuantity = parseFloat(quantityMatch[1]);
+            itemUnit = quantityMatch[2] || "kg";
+          }
+        } 
+        // Pattern 2: "quantity unit Item" or "quantity Item"
+        else {
+          const quantityFirstMatch = trimmedLine.match(/^(\d+(?:\.\d+)?)\s*(\w+)?\s+(.+)/);
+          if (quantityFirstMatch) {
+            itemQuantity = parseFloat(quantityFirstMatch[1]);
+            itemUnit = quantityFirstMatch[2] || "kg";
+            itemName = quantityFirstMatch[3];
+          } else {
+            // Pattern 3: Just item name
+            itemName = trimmedLine;
+          }
+        }
+        
+        if (itemName) {
+          const newItem: GroceryItem = {
+            id: uuidv4(),
+            name: itemName,
+            quantity: itemQuantity,
+            unit: itemUnit,
+            estimatedPrice: itemPrice
+          };
+          parsedItems.push(newItem);
         }
       }
+    });
+    
+    // Add all parsed items to the list
+    if (parsedItems.length > 0) {
+      parsedItems.forEach(item => {
+        if (onSubmit) {
+          onSubmit(item);
+        }
+      });
+      
+      toast({
+        title: isEnglish ? "Items Extracted" : "আইটেম নিষ্কাশিত",
+        description: isEnglish 
+          ? `Successfully added ${parsedItems.length} items from the uploaded file.`
+          : `আপলোড করা ফাইল থেকে সফলভাবে ${parsedItems.length}টি আইটেম যোগ করা হয়েছে।`
+      });
     }
   };
 
