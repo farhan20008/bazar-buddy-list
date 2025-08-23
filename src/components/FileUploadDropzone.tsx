@@ -37,33 +37,45 @@ export function FileUploadDropzone({ onFilesProcessed }: FileUploadDropzoneProps
 
     setIsProcessing(true);
     try {
-      // Simulate file processing - in real implementation, you would:
-      // 1. Upload files to storage
-      // 2. Use OCR service for images
-      // 3. Extract text from PDFs
-      // 4. Parse grocery items from extracted text
+      let allExtractedText = '';
       
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate processing
+      for (const file of uploadedFiles) {
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        const response = await fetch('/functions/v1/extract-text-ocr', {
+          method: 'POST',
+          body: formData,
+        });
+        
+        const result = await response.json();
+        
+        if (result.success && result.extractedText) {
+          allExtractedText += result.extractedText + '\n';
+        } else {
+          console.warn(`Failed to extract text from ${file.name}:`, result.error);
+        }
+      }
       
-      // Mock extracted text
-      const mockExtractedText = `
-        Rice - 2 kg
-        Potatoes - 1 kg
-        Onions - 500g
-        Chicken - 1 kg
-        Milk - 1 liter
-        Eggs - 12 pieces
-      `;
-      
-      onFilesProcessed(mockExtractedText);
-      setUploadedFiles([]);
-      
-      toast({
-        title: isEnglish ? "Files Processed" : "ফাইল প্রক্রিয়া সম্পন্ন",
-        description: isEnglish 
-          ? "Items extracted from your files have been added to the form" 
-          : "আপনার ফাইল থেকে আইটেম নিষ্কাশন করে ফর্মে যোগ করা হয়েছে"
-      });
+      if (allExtractedText.trim()) {
+        onFilesProcessed(allExtractedText);
+        setUploadedFiles([]);
+        
+        toast({
+          title: isEnglish ? "Files Processed" : "ফাইল প্রক্রিয়া সম্পন্ন",
+          description: isEnglish 
+            ? "Items extracted from your files have been added to the form" 
+            : "আপনার ফাইল থেকে আইটেম নিষ্কাশন করে ফর্মে যোগ করা হয়েছে"
+        });
+      } else {
+        toast({
+          title: isEnglish ? "No Text Found" : "কোন টেক্সট পাওয়া যায়নি",
+          description: isEnglish 
+            ? "Could not extract readable text from the uploaded files" 
+            : "আপলোড করা ফাইল থেকে পাঠযোগ্য টেক্সট নিষ্কাশন করা যায়নি",
+          variant: "destructive"
+        });
+      }
     } catch (error) {
       console.error('Error processing files:', error);
       toast({
